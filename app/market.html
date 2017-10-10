@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!-- saved from url=(0046)http://www.cssplay.co.uk/menu/tablescroll.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
+
+<!--[if lt IE 9]>
+ <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+ <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+<![endif]-->
+<title> List Market </title>
+<script src="./market.js"></script>
+</head>
+<div class="outer">
+<div class="innera">
+    <table id="addRow" summary="This table lists Maket list receipt.", align="center">
+      <caption>市场行情</caption>
+      <thead>
+        <tr>
+          <th scope="col">#</th> 
+          <th scope="col">挂单日期</th> 
+          <th scope="col">挂牌编号</th> 
+          <th scope="col">仓单编号</th> 
+          <th scope="col">品种代码</th> 
+          <th scope="col">产期</th>
+          <th scope="col">等级</th>  
+          <th scope="col">仓库代码</th> 
+          <th scope="col">产地代码</th>
+          <th scope="col">报价类型</th> 
+          <th scope="col">价格</th> 
+          <th scope="col">挂牌量</th> 
+          <th scope="col">成交量</th> 
+          <th scope="col">剩余量</th>
+          <th scope="col">挂牌截止日期</th> 
+          <th scope="col">交割单位</th> 
+        </tr>
+      </thead>
+      <tbody></tbody>
+</table>
+</div>
+<div>
+  <div class="right">
+    <label for="select">选择仓单:</label>
+    <select name="select" class="select" id="select">
+    </select>
+    <li>
+      <label for="textfield6">价格:</label>
+      <input type="text" name="textfield" id="textfield">
+    </li>
+    <li>
+      <label for="textfield7">数量:</label>
+      <input type="text" name="textfield2" id="textfield2">
+   </li>
+    <li>
+      <label for="textfield9">挂牌截止日期:</label>
+      <input type="text" name="textfield3" id="textfield3">
+    </li>
+<input type="button" onclick="App.addTr()" value="挂单"></div>
+  <div class="left">
+    <input type="button" name="button2" id="button2" value="我的挂单" onclick="getTr()">
+    <input type="button" name="button3" id="button3" value="我的合同">
+    <input type="button" name="button" id="button" value="我的仓单">
+</div>
+</div>
+</body>
+</html>

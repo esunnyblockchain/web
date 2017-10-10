@@ -1,0 +1,71 @@
+.outer { font:normal 11px/12px 'latomedium', arial, sans-serif;
+position:relative;
+padding:40px 0 30px 0;
+width:1200px;
+background:#eee;
+margin:0 auto;
+text-align: center;
+}
+.innera {
+overflow:auto;
+width:1200px;
+height:200px;
+background:#eee;
+}
+
+.outer table caption {
+position:absolute;
+width:1200px;
+top:0;
+left:0;
+height:22px;
+background:#697210;
+color:#fff;
+}
+.outer thead tr {
+position:absolute;
+top:20px;
+height:20px;
+left:0;
+}
+.outer tfoot td {
+position:absolute;
+width:100px;
+text-align:left;
+background:#f0c992; 
+border:1px solid #000;
+color:#000;
+bottom:0;
+left:0
+}
+.outer th, .outer td {
+width:10em; 
+text-align:center;
+}
+.outer th {
+background:#724a10; 
+color:#fff;
+text-align: center;
+}
+
+.traderInfo {
+}
+.right {
+	right: 0px;
+	position: absolute;
+	margin-top: 0px;
+	width: 400px;
+	display: inline-table;
+	padding-top: 0px;
+	padding-left: 10px;
+	text-align: center;
+}
+.left {
+	position: absolute;
+	left: 0px;
+}
+.select {
+	padding: 0;
+	width: 150px;
+	left: -5px;
+}
