@@ -65,5 +65,7 @@ module.exports = function(deployer) {
   //contract
   deployer.deploy(ContractAddress);
   deployer.deploy(Market);
+  deployer.deploy(UserList);
+  deployer.deploy(CreateID);
   deployer.deploy(User);
 };

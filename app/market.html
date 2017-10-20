@@ -4,15 +4,16 @@
 <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1">
 
 <!--[if lt IE 9]>
- <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+ <script srleftp://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
  <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
 <![endif]-->
 <title> List Market </title>
 <script src="./market.js"></script>
 </head>
+<body>
 <div class="outer">
 <div class="innera">
-    <table id="addRow" summary="This table lists Maket list receipt.", align="center">
+    <table id="addRow" summary="This table lists Maket list receipt." align="center">
       <caption>市场行情</caption>
       <thead>
         <tr>
@@ -39,12 +40,13 @@
 </div>
 <div>
   <div class="right">
-    <label for="select">选择仓单:</label>
-    <select name="select" class="select" id="select">
-    </select>
+    <li>
+    <label for="select">仓单ID:</label>
+    <input type="text" name="textfield0" id="textfield0">
+    </li>
     <li>
       <label for="textfield6">价格:</label>
-      <input type="text" name="textfield" id="textfield">
+      <input type="text" name="textfield1" id="textfield1">
     </li>
     <li>
       <label for="textfield7">数量:</label>
@@ -54,12 +56,16 @@
       <label for="textfield9">挂牌截止日期:</label>
       <input type="text" name="textfield3" id="textfield3">
     </li>
-<input type="button" onclick="App.addTr()" value="挂单"></div>
+<input type="button" onclick="App.listRequest()" value="挂单"></div>
   <div class="left">
-    <input type="button" name="button2" id="button2" value="我的挂单" onclick="getTr()">
-    <input type="button" name="button3" id="button3" value="我的合同">
-    <input type="button" name="button" id="button" value="我的仓单">
+    <input type="button" name="button2" id="button2" value="我的挂单" onclick="App.listReceipt()">
+    <input type="button" name="button3" id="button3" value="我的合同" onclick ="App.myTrade()">
+    <input type="button" name="button" id="button" value="我的仓单" onclick = "App.myReceipt()">
+  </div>
 </div>
 </div>
+<div id=listReceipt><table id="taReceipt"><thead><tr><td>操作</td><td>委托编号</td><td>委托日期</td><td>品种</td><td>产期</td><td>等级</td><td>买卖</td><td>价格</td><td>挂牌量</td><td>剩余量</td><td>成交量</td><td>挂牌到期日</td></tr></thead><tbody></tbody></table></div>
+<div id=myTrade style="display:none"><table id="taTrade"><thead></thead><tbody></tbody><tr><td>合同日期</td><td>合同编号</td><td>仓单编号</td><td>买卖</td><td>价格</td><td>合同量</td><td>手续费</td><td>已划货款</td><td>剩余货款</td><td>己方id</td><td>对手方id</td><td>交收状态</td><td>交易方式</td></tr></table></div>
+<div id=myReceipt style="display:none"><table id = "taMyReceipt"><thead><tr><td>用户id</td><td>仓单序号</td><td>品种id</td><td>产期</td><td>等级</td><td>仓库代码</td><td>产地代码</td><td>仓单总量</td><td>可用数量</td><td>冻结数量</td></tr></thead><tbody></tbody></table></div>
 </body>
 </html>
