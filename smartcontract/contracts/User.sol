@@ -12,6 +12,7 @@ import "./lib/StructMarket.sol";
 
 contract User
 {
+    event getRet(uint ret);
 	//挂牌请求数据结构
 	struct ListRequest
 	{
@@ -117,6 +118,7 @@ contract User
 		if(sheet.available_amount_ == 0)
 		{
 			//TODO event
+            getRet(uint(-1));
 			return uint(-1);
 		}
 		market =  Market(contract_address.getContractAddress(market_name));
@@ -128,6 +130,7 @@ contract User
 			freeze(sheet_id, sell_qty);
 		}
 		list_req.push(ListRequest(sheet_id, ret_market_id, price, sell_qty, 0, sell_qty)); 
+        getRet(ret_market_id);
 	}
 	function getListReqNum() returns(uint)
 	{

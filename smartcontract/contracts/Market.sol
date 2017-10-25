@@ -9,6 +9,7 @@ import "./lib/LibMarketMap.sol";
  
 contract  Market
 {
+    event getRet(uint ret);
     using LibMarketMap for LibMarketMap.MarketMap;
 
     LibMarketMap.MarketMap  market_map;
@@ -113,6 +114,7 @@ contract  Market
         temp_market.user_id_    = user_id;
         temp_market.seller_addr_= msg.sender;
         market_map.insert(market_id, temp_market);
+        getRet(market_id);
         return market_id;        
     }
     
