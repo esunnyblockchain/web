@@ -25,6 +25,8 @@ let first_click = 0;
 var user_instance;
 var market_instance;
 
+var global_market_id;//全局行情id
+
 window.App = {
   start: function() {
     var self = this;
@@ -70,10 +72,33 @@ window.App = {
         //获取Market地址
        market_instance = instance;
        console.log(market_instance);
+       market_instance.getMarketID.call().then(function(ret){
+            console.log("页面刷新Start global_market_id:"+ret);
+            global_market_id = ret;
+       });
        self.listMarket();
+       setInterval(self.syncMaket,5000); 
     });
   },
 
+  //检查market_id改变时，进行同步
+  syncMaket: function(){
+      market_instance.getMarketID.call().then(function(ret){
+            console.log("Now MarketID:"+ret);
+            console.log("global_market_id:"+global_market_id);
+            if (ret > global_market_id)
+            {
+               var behind = ret - global_market_id;
+               console.log("behind:"+behind);
+               while (behind > 0)
+               {
+                    App.eventTrigger();
+                    behind--;
+                    global_market_id++;
+               }
+            }
+      });
+  },
   //刷新市场行情
   listMarket: function(){
       var self = this;
@@ -97,16 +122,16 @@ window.App = {
               var whe_id;
               var place_id;
               var price;
+              var user_id;
               var list_qty;
               var deal_qty;
               var rem_qty;
               var dead_line;
               var dlv_uint;
-              var user_id;
               var seller_addr;
-
+              console.log("开始第"+index+"轮");
               market_instance.getMarketStr_1.call(index).then(function(ret){
-                      console.log("getMarketStr_1 date:"+ret[0]);
+                      console.log(index+" getMarketStr_1 date:"+ret[0]);
                       //时间转换*s到yyyymmdd
                       /*
                       var date = new Date();
@@ -116,7 +141,7 @@ window.App = {
                       console.log("Year:"+year);
                       */
                       date = ret[0];
-                      console.log("getMarketStr_1 marketID:"+ret[1]);
+                      console.log(index+" getMarketStr_1 marketID:"+ret[1]);
                       market_id = ret[1];
                       console.log("getMarketStr_1 sheet_id:"+ret[2]);
                       sheet_id = ret[2];
@@ -130,27 +155,31 @@ window.App = {
                       whe_id = ret[6];
                       console.log("getMarketStr_1 place_id:"+ret[7]);
                       place_id = ret[7];
+                      console.log("getMarketStr_1 执行完!!!"+index);
                 });    
-            market_instance.getMarketStr_2.call(index).then(function (ret){
-                    var price = ret[0];
-                    console.log("getMarket_2 price:"+ret[0]);
-                    var list_qty = ret[1];
-                    console.log("getMarket_2 listqty:"+ ret[1]);
-                    var deal_qty = ret[2];
-                    console.log("getMarket_2 deal_qty:"+ret[2]);
-                    var rem_qty = ret[3];
-                    console.log("getMarket_2 rem_qty:"+ret[3]);
-                    var dead_line = ret[4];
-                    console.log("getMarket_2 dealine:"+ret[4]);
-                    var dlv_uint = ret[5];
-                    console.log("getMarket_2 dlv_uint:"+ret[5]);
-                    var user_id = ret[6];
+
+            market_instance.getMarketStr_2.call(index).then(function (result){
+                    price = result[0];
+                    console.log("getMarket_2 price:"+result[0]);
+                    list_qty = result[1];
+                    console.log("getMarket_2 listqty:"+ result[1]);
+                    deal_qty = result[2];
+                    console.log("getMarket_2 deal_qty:"+result[2]);
+                    rem_qty = result[3];
+                    console.log("getMarket_2 rem_qty:"+result[3]);
+                    dead_line = result[4];
+                    console.log("getMarket_2 dealine:"+result[4]);
+                     dlv_uint = result[5];
+                    console.log("getMarket_2 dlv_uint:"+result[5]);
+                     user_id = result[6];
                     //记住bytes32ToString转换
-                    console.log("getMarket_2 user_id:"+ret[6]);
-                    var seller_addr = ret[7];
-                    console.log("getMarket_2 seller_addr:"+ret[7]);
-                    self.addTr(date,market_id, sheet_id, class_id, make_date, lev_id,whe_id, place_id, "yikoujia",price, list_qty, deal_qty, rem_qty, dead_line,dlv_uint);
+                    console.log("getMarket_2 user_id:"+result[6]);
+                    seller_addr = result[7];
+                    console.log("getMarket_2 seller_addr:"+result[7]);
+                    console.log("getMarketStr_2执行完!!!"+index);
+                 App.addTr(date,market_id, sheet_id, class_id, make_date, lev_id,whe_id, place_id, "yikoujia",price, list_qty, deal_qty, rem_qty, dead_line,dlv_uint);
             });
+            
           }//for
      }//if
     });
@@ -171,13 +200,20 @@ window.App = {
     var dead_line = document.getElementById("textfield3").value;
     console.log("dead_line:"+dead_line);
    
-    var onlyone = 0;
     user_instance.listRequest.sendTransaction("User",sheet_id, sheet_price, sheet_amount,{from:account, gas:9000000}).then(function(ret){
                 console.log("marktet_transactionHash:"+ret);
+                self.eventTrigger();
+                global_market_id++;
             }); //user_instance
+  },
+  eventTrigger:function(){
+    var self =this;
+    console.log("eventTrigger !!!!");
+    var onlyone = 0;
     var event = market_instance.getRet(function(error, result){
-                    if (!error)
+                    if (!error && !onlyone)
                     {
+                        onlyone++;
                         console.log("listRequest retMarketid:"+result.args.ret);
                         var retMarketid = result.args.ret;
                         if (retMarketid != -1)
@@ -208,8 +244,7 @@ window.App = {
                                     lev_id = ret[5];
                                     whe_id = ret[6];
                                     place_id = ret[7];
-                                    }); 
-                    market_instance.getMarketStr_2.call(retMarketid).then(function(ret){
+                          market_instance.getMarketStr_2.call(retMarketid).then(function(ret){
                                     price = ret[0];
                                     list_qty = ret[1];
                                     deal_qty = ret[2];
@@ -218,15 +253,14 @@ window.App = {
                                     dlv_uint = ret[5];
                                     user_id = ret[6];
 
-                                    self.addTr(date, market_id, sheet_id, class_id,make_date, lev_id, whe_id, place_id, "yikoujia", price, list_qty,deal_qty, rem_qty, dead_line, dlv_uint);
-                                    //关闭event监听
-                                    });
+                                    App.addTr(date, market_id, sheet_id, class_id,make_date, lev_id, whe_id, place_id, "yikoujia", price, list_qty,deal_qty, rem_qty, dead_line, dlv_uint);
+                                    }); 
+                          });
                     }//if(retMarketid != -1)
                     }//if (!error)
-                    event.stopWatching();
        });//event
+    
   },
-
   //<获取MarketID,UserId写死
   getMarktID: function(){
         UserList.deployed().then(function (instance){
@@ -337,7 +371,7 @@ window.App = {
       user_instance.getSheetMapNum.call().then(function(len){
               console.log("sheetMap len:"+len);
               for (var index = 0; index < len; index++)
-             {
+              {
                  user_instance.getSheetMap_1.call(index).then(function(result){
                              sheet_id = result[1];
                              console.log("class_id:"+result[2]);
@@ -361,9 +395,7 @@ window.App = {
                              self.addmyReceipt(user_id, sheet_id, class_id, make_date, lev_id, whe_id, place_id, all_amount, avail_amount, frozen_amount);
                                  });
    }
-
-      });
-        
+    });      
   },
     //填充taReceipt表
     //参数：委托编号(挂单编号),委托日期(挂单日期),等级,产期,等级,买卖,价格,挂牌量,剩余量,成交量,挂牌到期日

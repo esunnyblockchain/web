@@ -126,7 +126,6 @@ window.App = {
   createReceipt: function(){
     var self = this;
     var user_id = document.getElementById("userid").value;
-    var sheet_id = parseInt(document.getElementById("sheetid").value);
 
     var class_id = document.getElementById("classid").value;
     var asscii_class_id = web3.fromAscii(class_id);
@@ -166,15 +165,19 @@ window.App = {
         meta_user.setMarketName.sendTransaction("Market", {from:account, gas:300000});
         meta_user.setCreateIDName.sendTransaction("CreateID", {from:account,gas:300000});
         meta_user.setUserListName.sendTransaction("UserList", {from:account, gas:300000});
-        meta_user.setUserID.sendTransaction("User",{from:account, gas:300000});
+        meta_user.setUserID.sendTransaction(user_id,{from:account, gas:300000});
         //登记到userlist
        UserList.deployed().then(function(instance){
      
-            instance.addUser.sendTransaction(user_addr, user_addr,"User",1,{from:account, gas:300000});
+            instance.addUser.sendTransaction(user_addr, user_addr,user_id,1,{from:account, gas:300000});
         });
-        meta_user.insertSheet.sendTransaction(user_id, sheet_id, asscii_class_id, ascii_make_date,  ascii_lev_id, ascii_whe_id, ascii_palce_id, receipt_amount,frozen_amount,available_amount,{from:account, gas:70000000}).then(function(){
-            meta_user.getSheetAmount.call(sheet_id).then(function(ret){self.setStatus('Receipt Amount:'+ret[0]+',Avaliable_amount:'+ret[1]+',Frozen_amount:'+ret[2]);});
-        
+        meta_user.insertSheet.sendTransaction(user_id, asscii_class_id, ascii_make_date,  ascii_lev_id, ascii_whe_id, ascii_palce_id, receipt_amount,frozen_amount,available_amount,{from:account, gas:70000000}).then(function(){
+            meta_createID.getSheetID.call().then(function (ret){
+                var id = ret - 1;
+                console.log("InserSheet sheet_id:"+id);
+                meta_user.getSheetAmount.call(id).then(function(ret){self.setStatus('Receipt Amount:'+ret[0]+',Avaliable_amount:'+ret[1]+',Frozen_amount:'+ret[2]);}); 
+            });
+            meta_contractAddr.getContractAddress.call("CreateID").then(function(ret){console.log(" in CreateID:"+ret);});
         });
     });
     
