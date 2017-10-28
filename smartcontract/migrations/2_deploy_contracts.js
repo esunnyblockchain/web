@@ -25,6 +25,7 @@ var Market = artifacts.require("Market");
 
 module.exports = function(deployer) {
 
+
   //independ
   deployer.deploy(CreateID);
 
@@ -61,8 +62,6 @@ module.exports = function(deployer) {
 
   deployer.link(StructTrade, [User]);
   deployer.link(LibTradeMap, [User]);
-
-  deployer.link(LibString, [User]);
 
   //contract
   deployer.deploy(ContractAddress);

@@ -11,6 +11,7 @@ library LibSheetMap
         uint[] keyIndex;
     }
 
+    //创建仓单
     function insert(SheetMap storage self, uint k, StructSheet.value v)  internal returns (bool replaced)
     {
         replaced = true;
@@ -21,12 +22,37 @@ library LibSheetMap
         }
         self.data[k] = v;
     }
+
+    //更新仓单数量
     function update(SheetMap storage self, uint k, uint all_amount, uint available_amount, uint frozen_amount) internal
     {
         self.data[k].all_amount_ = all_amount;
         self.data[k].available_amount_ = available_amount;
         self.data[k].frozen_amount_ = frozen_amount;
     }
+
+    //增加仓单
+    function add(SheetMap storage self,uint k, uint qty)
+    {
+        self.data[k].all_amount_        += qty;
+        self.data[k].available_amount_  += qty;
+
+    }
+
+    //减少仓单
+    function reduce(SheetMap storage self, uint k, uint qty)
+    {
+        self.data[k].all_amount_ -=  qty;
+    }
+
+    //冻结仓单
+    function freeze(SheetMap storage self, uint k, uint qty)
+    {
+        self.data[k].available_amount_  -=  qty;
+        self.data[k].frozen_amount_      += qty;
+    }
+
+    //移除仓单
     function remove(SheetMap storage self, uint k) internal returns (bool existed)
     {
         if(self.data[k].user_id_ == "")
@@ -44,13 +70,18 @@ library LibSheetMap
     {
         return self.data[k];
     }
-    /*
-    function isExisted(SheetMap storage self, bytes32 k) internal returns (bool existed)
+
+    //判断该种仓单是否存在
+    function isExisted(SheetMap storage self, bytes32 class_id, bytes32 make_date, bytes32 lev_id, bytes32 wh_id, bytes32 place_id) internal returns (bool)
     {
-        var (ret, ) = LibString.inArray(k, self.keyIndex);
-        return ret;
+        for(uint i = 0; i < self.keyIndex.length; i++)
+        {
+            if( self.data[i].class_id_ == class_id && self.data[i].make_date_ == make_date && self.data[i].lev_id_ == lev_id && self.data[i].wh_id_ == wh_id && self.data[i].place_id_ == place_id) 
+                return true;
+        }
+        return false;
     }
-    */
+
     function empty(SheetMap storage self) internal returns (bool)
     {
         return (self.keyIndex.length == 0);

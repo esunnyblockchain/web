@@ -6,6 +6,12 @@ contract CreateID
     uint        neg_id_;        //协商id
     uint        market_id_;
     
+    //创建仓单id
+    function getSheetID() returns(uint)
+    {
+        return ++sheet_id_;
+    }
+
     //创建合同id
     function getTradeID() returns(uint )
     {

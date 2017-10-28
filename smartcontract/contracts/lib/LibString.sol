@@ -1,8 +1,8 @@
 pragma solidity ^0.4.2;
 library LibString {
-    
+
     using LibString for *;
-    
+
     function memcpy(uint dest, uint src, uint len) private {
         // Copy word-length chunks while possible
         for(; len >= 32; len -= 32) {
@@ -21,7 +21,7 @@ library LibString {
             mstore(dest, or(destpart, srcpart))
         }
     }
-    
+
     // Returns the memory address of the first byte of the first occurrence of
     // `needle` in `self`, or the first byte after `self` if not found.
     function findPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private returns (uint) {
@@ -37,13 +37,13 @@ library LibString {
                     let end := add(selfptr, sub(selflen, needlelen))
                     ptr := selfptr
                     loop:
-                    jumpi(exit, eq(and(mload(ptr), mask), needledata))
+                        jumpi(exit, eq(and(mload(ptr), mask), needledata))
                     ptr := add(ptr, 1)
                     jumpi(loop, lt(sub(ptr, 1), end))
                     ptr := add(selfptr, selflen)
                     exit:
                 }
-                return ptr;
+                    return ptr;
             } else {
                 // For long needles, use hashing
                 bytes32 hash;
@@ -60,13 +60,13 @@ library LibString {
         }
         return selfptr + selflen;
     }
-    
+
     /*
     function length(string _self) internal returns (uint _ret) {
         _ret = bytes(_self).length;
-    }
-    */
-    
+}
+*/
+
     function compare(string _self, string _str) internal returns (int8 _ret) {
         for (uint i=0; i<bytes(_self).length && i<bytes(_str).length; ++i) {
             if (bytes(_self)[i] > bytes(_str)[i]) {
@@ -75,7 +75,7 @@ library LibString {
                 return -1;
             }
         }
-        
+
         if (bytes(_self).length > bytes(_str).length) {
             return 1;
         } if (bytes(_self).length < bytes(_str).length) {
@@ -103,7 +103,7 @@ library LibString {
                 }
             }
         }
-        
+
         if (bytes(_self).length > bytes(_str).length) {
             return 1;
         } if (bytes(_self).length < bytes(_str).length) {
@@ -123,7 +123,7 @@ library LibString {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -145,10 +145,10 @@ library LibString {
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     function substr(string _self, uint _start, uint _len) internal returns (string _ret) {
         if (_len > bytes(_self).length-_start) {
             _len = bytes(_self).length-_start;
@@ -158,7 +158,7 @@ library LibString {
             _ret = "";
             return;
         }
-        
+
         _ret = new string(_len);
 
         uint selfptr;
@@ -167,10 +167,10 @@ library LibString {
             selfptr := add(_self, 0x20)
             retptr := add(_ret, 0x20)
         }
-        
+
         memcpy(retptr, selfptr+_start, _len);
     }
-    
+
     function concat(string _self, string _str) internal returns (string _ret) {
         _ret = new string(bytes(_self).length + bytes(_str).length);
 
@@ -182,13 +182,13 @@ library LibString {
             strptr := add(_str, 0x20)
             retptr := add(_ret, 0x20)
         }
-        
+
         memcpy(retptr, selfptr, bytes(_self).length);
         memcpy(retptr+bytes(_self).length, strptr, bytes(_str).length);
     }
-    
+
     function concat(string _self, string _str1, string _str2)
-        internal returns (string _ret) {
+    internal returns (string _ret) {
         _ret = new string(bytes(_self).length + bytes(_str1).length + bytes(_str2).length);
 
         uint selfptr;
@@ -201,34 +201,7 @@ library LibString {
             str2ptr := add(_str2, 0x20)
             retptr := add(_ret, 0x20)
         }
-        
-        uint pos = 0;
-        memcpy(retptr+pos, selfptr, bytes(_self).length);
-        pos += bytes(_self).length;
-        memcpy(retptr+pos, str1ptr, bytes(_str1).length);
-        pos += bytes(_str1).length;
-        memcpy(retptr+pos, str2ptr, bytes(_str2).length);
-        pos += bytes(_str2).length;
-    }
-    
-    function concat(string _self, string _str1, string _str2, string _str3)
-        internal returns (string _ret) {
-        _ret = new string(bytes(_self).length + bytes(_str1).length + bytes(_str2).length
-            + bytes(_str3).length);
 
-        uint selfptr;
-        uint str1ptr;
-        uint str2ptr;
-        uint str3ptr;
-        uint retptr;
-        assembly {
-            selfptr := add(_self, 0x20)
-            str1ptr := add(_str1, 0x20)
-            str2ptr := add(_str2, 0x20)
-            str3ptr := add(_str3, 0x20)
-            retptr := add(_ret, 0x20)
-        }
-        
         uint pos = 0;
         memcpy(retptr+pos, selfptr, bytes(_self).length);
         pos += bytes(_self).length;
@@ -236,10 +209,37 @@ library LibString {
         pos += bytes(_str1).length;
         memcpy(retptr+pos, str2ptr, bytes(_str2).length);
         pos += bytes(_str2).length;
-        memcpy(retptr+pos, str3ptr, bytes(_str3).length);
-        pos += bytes(_str3).length;
     }
-    
+
+    function concat(string _self, string _str1, string _str2, string _str3)
+    internal returns (string _ret) {
+        _ret = new string(bytes(_self).length + bytes(_str1).length + bytes(_str2).length
+                          + bytes(_str3).length);
+
+                          uint selfptr;
+                          uint str1ptr;
+                          uint str2ptr;
+                          uint str3ptr;
+                          uint retptr;
+                          assembly {
+                              selfptr := add(_self, 0x20)
+                              str1ptr := add(_str1, 0x20)
+                              str2ptr := add(_str2, 0x20)
+                              str3ptr := add(_str3, 0x20)
+                              retptr := add(_ret, 0x20)
+                          }
+
+                          uint pos = 0;
+                          memcpy(retptr+pos, selfptr, bytes(_self).length);
+                          pos += bytes(_self).length;
+                          memcpy(retptr+pos, str1ptr, bytes(_str1).length);
+                          pos += bytes(_str1).length;
+                          memcpy(retptr+pos, str2ptr, bytes(_str2).length);
+                          pos += bytes(_str2).length;
+                          memcpy(retptr+pos, str3ptr, bytes(_str3).length);
+                          pos += bytes(_str3).length;
+    }
+
     function trim(string _self) internal returns (string _ret) {
         uint i;
         uint8 ch;
@@ -250,7 +250,7 @@ library LibString {
             }
         }
         uint start = i;
-        
+
         for (i=bytes(_self).length; i>0; --i) {
             ch = uint8(bytes(_self)[i-1]);
             if (!(ch == 0x20 || ch == 0x09 || ch == 0x0D || ch == 0x0A)) {
@@ -258,19 +258,19 @@ library LibString {
             }
         }
         uint end = i;
-        
+
         _ret = new string(end-start);
-        
+
         uint selfptr;
         uint retptr;
         assembly {
             selfptr := add(_self, 0x20)
             retptr := add(_ret, 0x20)
         }
-        
+
         memcpy(retptr, selfptr+start, end-start);
     }
-    
+
     function trim(string _self, string _chars) internal returns (string _ret) {
         uint16 i;
         uint16 j;
@@ -288,7 +288,7 @@ library LibString {
             }
         }
         uint16 start = i;
-        
+
         for (i=uint16(bytes(_self).length); i>0; --i) {
             matched = false;
             for (j=0; j<bytes(_chars).length; ++j) {
@@ -306,19 +306,19 @@ library LibString {
         if (end <= start) {
             return;
         }
-        
+
         _ret = new string(end-start);
-        
+
         uint selfptr;
         uint retptr;
         assembly {
             selfptr := add(_self, 0x20)
             retptr := add(_ret, 0x20)
         }
-        
+
         memcpy(retptr, selfptr+start, end-start);
     }
-    
+
     function split(string _self, string _delim, string[] storage _array) internal {
         //Why can not use delete _array?
         for (uint i=0; i<_array.length; ++i) {
@@ -332,14 +332,14 @@ library LibString {
             selfptr := add(_self, 0x20)
             delimptr := add(_delim, 0x20)
         }
-        
+
         uint pos = 0;
         while (true) {
             uint ptr;
             bool found = false;
             if (bytes(_delim).length > 0) {
                 ptr = findPtr(bytes(_self).length-pos, selfptr+pos, bytes(_delim).length, delimptr) - selfptr;
-                
+
                 if (ptr < bytes(_self).length) {
                     found = true;
                 } else {
@@ -348,7 +348,7 @@ library LibString {
             } else {
                 ptr = bytes(_self).length;
             }
-            
+
             string memory elem = new string(ptr-pos);
             uint elemptr;
             assembly {
@@ -357,13 +357,13 @@ library LibString {
             memcpy(elemptr, selfptr+pos, ptr-pos);
             pos = ptr + bytes(_delim).length;
             _array.push(elem);
-            
+
             if (!found) {
                 break;
             }
         }
     }
-    
+
     function indexOf(string _self, string _str) internal returns (int _ret) {
         uint selfptr;
         uint strptr;
@@ -371,7 +371,7 @@ library LibString {
             selfptr := add(_self, 0x20)
             strptr := add(_str, 0x20)
         }
-        
+
         uint ptr = findPtr(bytes(_self).length, selfptr, bytes(_str).length, strptr) - selfptr;
         if (ptr < bytes(_self).length) {
             _ret = int(ptr);
@@ -379,7 +379,7 @@ library LibString {
             _ret = -1;
         }
     }
-    
+
     function indexOf(string _self, string _str, uint pos) internal returns (int _ret) {
         uint selfptr;
         uint strptr;
@@ -387,7 +387,7 @@ library LibString {
             selfptr := add(_self, 0x20)
             strptr := add(_str, 0x20)
         }
-        
+
         uint ptr = findPtr(bytes(_self).length-pos, selfptr+pos, bytes(_str).length, strptr) - selfptr;
         if (ptr < bytes(_self).length) {
             _ret = int(ptr);
@@ -395,13 +395,13 @@ library LibString {
             _ret = -1;
         }
     }
-    
+
     function toInt(string _self) internal returns (int _ret) {
         _ret = 0;
         if (bytes(_self).length == 0) {
             return;
         }
-        
+
         uint16 i;
         uint8 digit;
         for (i=0; i<bytes(_self).length; ++i) {
@@ -410,7 +410,7 @@ library LibString {
                 break;
             }
         }
-        
+
         bool positive = true;
         if (bytes(_self)[i] == '+') {
             positive = true;
@@ -427,7 +427,7 @@ library LibString {
             }
             _ret = _ret*10 + int(digit-0x30);
         }        
-        
+
         if (!positive) {
             _ret = -_ret;
         }
@@ -442,7 +442,7 @@ library LibString {
                 break;
             }
         }
-        
+
         if (bytes(_self).length-i < 2) {
             return address(0);
         }
@@ -453,7 +453,7 @@ library LibString {
         }
 
         uint addr = 0;
-        
+
         for (i+=2; i<bytes(_self).length; ++i) {
             digit = uint8(bytes(_self)[i]);
             if (digit >= 0x30 && digit <= 0x39) //'0'-'9'
@@ -462,16 +462,16 @@ library LibString {
                 digit = digit-0x61+10;
             else 
                 return address(0); 
-            
+
             addr = addr*16+digit;
         }
-        
+
         return address(addr);
     }
-    
+
     function toKeyValue(string _self, string _key) internal returns (string _ret) {
         _ret = new string(bytes(_self).length + bytes(_key).length + 5);
-        
+
         uint selfptr;
         uint keyptr;
         uint retptr;
@@ -480,16 +480,16 @@ library LibString {
             keyptr := add(_key, 0x20)
             retptr := add(_ret, 0x20)
         }
-        
+
         uint pos = 0;
 
         bytes(_ret)[pos++] = '"';
         memcpy(retptr+pos, keyptr, bytes(_key).length);
         pos += bytes(_key).length;
         bytes(_ret)[pos++] = '"';
-        
+
         bytes(_ret)[pos++] = ':';
-        
+
         bytes(_ret)[pos++] = '"';
         memcpy(retptr+pos, selfptr, bytes(_self).length);
         pos += bytes(_self).length;
@@ -518,7 +518,7 @@ library LibString {
         bytes(_ret)[pos++] = ':';
 
         bytes(_ret)[pos++] = '[';
-        
+
         for (i=0; i<_self.length; ++i) {
             bytes(_ret)[pos++] = '"';
             for (j=0; j<bytes(_self[i]).length; ++j) {
@@ -529,10 +529,10 @@ library LibString {
             if (i < _self.length-1)
                 bytes(_ret)[pos++] = ',';
         }
-        
+
         bytes(_ret)[pos++] = ']';
     }
-    
+
     function getStringValueByKey(string _self, string _key) internal returns (string _ret) {
         int pos = -1;
         uint searchStart = 0;
@@ -551,14 +551,14 @@ library LibString {
             while (uint(pos) < bytes(_self).length) {
                 if (bytes(_self)[uint(pos)] == ' ' || bytes(_self)[uint(pos)] == '\t' 
                     || bytes(_self)[uint(pos)] == '\r' || bytes(_self)[uint(pos)] == '\n') {
-                    pos++;
-                } else if (bytes(_self)[uint(pos)] == ':') {
-                    pos++;
-                    colon = true;
-                    break;
-                } else {
-                    break;
-                }
+                        pos++;
+                    } else if (bytes(_self)[uint(pos)] == ':') {
+                        pos++;
+                        colon = true;
+                        break;
+                    } else {
+                        break;
+                    }
             }
 
             if(uint(pos) == bytes(_self).length) {
@@ -571,50 +571,50 @@ library LibString {
                 searchStart = uint(pos);
             }
         }
-        
+
         bool doubleQuotes = true;
         int start = _self.indexOf("\"", uint(pos));
-        if (start == -1) {
-            doubleQuotes = false;
-            start = _self.indexOf("'", uint(pos));
-            if (start == -1) {
+                                  if (start == -1) {
+                                  doubleQuotes = false;
+                                  start = _self.indexOf("'", uint(pos));
+                                  if (start == -1) {
+                                      return;
+                                  }
+    }
+    start += 1;
+
+    int end;
+    if (doubleQuotes) {
+        end = _self.indexOf("\"", uint(start));
+    } else {
+        end = _self.indexOf("'", uint(start));
+    }
+    if (end == -1) {
+        return;
+    }
+
+    _ret = _self.substr(uint(start), uint(end-start));
+}
+
+function getIntValueByKey(string _self, string _key) internal returns (int _ret) {
+    _ret = 0;
+    int pos = -1;
+    uint searchStart = 0;
+    while (true) {
+        pos = _self.indexOf("\"".concat(_key, "\""), searchStart);
+        if (pos == -1) {
+            pos = _self.indexOf("'".concat(_key, "'"), searchStart);
+            if (pos == -1) {
                 return;
             }
         }
-        start += 1;
-        
-        int end;
-        if (doubleQuotes) {
-            end = _self.indexOf("\"", uint(start));
-        } else {
-            end = _self.indexOf("'", uint(start));
-        }
-        if (end == -1) {
-            return;
-        }
-        
-        _ret = _self.substr(uint(start), uint(end-start));
-    }
-    
-    function getIntValueByKey(string _self, string _key) internal returns (int _ret) {
-        _ret = 0;
-        int pos = -1;
-        uint searchStart = 0;
-        while (true) {
-            pos = _self.indexOf("\"".concat(_key, "\""), searchStart);
-            if (pos == -1) {
-                pos = _self.indexOf("'".concat(_key, "'"), searchStart);
-                if (pos == -1) {
-                    return;
-                }
-            }
 
-            pos += int(bytes(_key).length+2);
+        pos += int(bytes(_key).length+2);
 
-            bool colon = false;
-            while (uint(pos) < bytes(_self).length) {
-                if (bytes(_self)[uint(pos)] == ' ' || bytes(_self)[uint(pos)] == '\t' 
-                    || bytes(_self)[uint(pos)] == '\r' || bytes(_self)[uint(pos)] == '\n') {
+        bool colon = false;
+        while (uint(pos) < bytes(_self).length) {
+            if (bytes(_self)[uint(pos)] == ' ' || bytes(_self)[uint(pos)] == '\t' 
+                || bytes(_self)[uint(pos)] == '\r' || bytes(_self)[uint(pos)] == '\n') {
                     pos++;
                 } else if (bytes(_self)[uint(pos)] == ':') {
                     pos++;
@@ -623,254 +623,279 @@ library LibString {
                 } else {
                     break;
                 }
-            }
-
-            if(uint(pos) == bytes(_self).length) {
-                return;
-            }
-
-            if (colon) {
-                break;
-            } else {
-                searchStart = uint(pos);
-            }
         }
 
-        uint i = uint(pos);
-        uint8 digit;
-        for (; i<bytes(_self).length; ++i) {
-            digit = uint8(bytes(_self)[i]);
-            if (!(digit == 0x20 || digit == 0x09 || digit == 0x0D || digit == 0x0A 
+        if(uint(pos) == bytes(_self).length) {
+            return;
+        }
+
+        if (colon) {
+            break;
+        } else {
+            searchStart = uint(pos);
+        }
+    }
+
+    uint i = uint(pos);
+    uint8 digit;
+    for (; i<bytes(_self).length; ++i) {
+        digit = uint8(bytes(_self)[i]);
+        if (!(digit == 0x20 || digit == 0x09 || digit == 0x0D || digit == 0x0A 
             || digit == 0x3A /*:*/ || digit == 0x22 /*"*/ || digit == 0x27 /*'*/)) {
                 break;
             }
-        }
-        
-        bool positive = true;
-        if (bytes(_self)[i] == '+') {
-            positive = true;
-            i++;
-        } else if(bytes(_self)[i] == '-') {
-            positive = false;
-            i++;
-        }
-
-        for (; i<bytes(_self).length; ++i) {
-            digit = uint8(bytes(_self)[i]);
-            if (!(digit >= 0x30 && digit <= 0x39)) {
-                if (!positive) {
-                    _ret = -_ret;
-                }
-                return;
-            }
-            _ret = _ret*10 + int(digit-0x30);
-        }        
-        
-        if (!positive) {
-            _ret = -_ret;
-        }
-    }
-    
-    function getArrayValueByKey(string _self, string _key) internal returns (string _ret) {
-        int pos = -1;
-        uint searchStart = 0;
-        while (true) {
-            pos = _self.indexOf("\"".concat(_key, "\""), searchStart);
-            if (pos == -1) {
-                pos = _self.indexOf("'".concat(_key, "'"), searchStart);
-                if (pos == -1) {
-                    return;
-                }
-            }
-
-            pos += int(bytes(_key).length+2);
-
-            bool colon = false;
-            while (uint(pos) < bytes(_self).length) {
-                if (bytes(_self)[uint(pos)] == ' ' || bytes(_self)[uint(pos)] == '\t' 
-                    || bytes(_self)[uint(pos)] == '\r' || bytes(_self)[uint(pos)] == '\n') {
-                    pos++;
-                } else if (bytes(_self)[uint(pos)] == ':') {
-                    pos++;
-                    colon = true;
-                    break;
-                } else {
-                    break;
-                }
-            }
-
-            if(uint(pos) == bytes(_self).length) {
-                return;
-            }
-
-            if (colon) {
-                break;
-            } else {
-                searchStart = uint(pos);
-            }
-        }
-
-        int start = _self.indexOf("[", uint(pos));
-        if (start == -1) {
-            return;
-        }
-        start += 1;
-        
-        int end = _self.indexOf("]", uint(pos));
-        if (end == -1) {
-            return;
-        }
-        
-        _ret = _self.substr(uint(start), uint(end-start));
     }
 
-    function getArrayValueByKey(string _self, string _key, string[] storage _array) internal {
-        //Why can not use delete _array?
-        for (uint i=0; i<_array.length; ++i) {
-            delete _array[i];
-        }
-        _array.length = 0;
-
-        int pos = -1;
-        uint searchStart = 0;
-        while (true) {
-            pos = _self.indexOf("\"".concat(_key, "\""), searchStart);
-            if (pos == -1) {
-                pos = _self.indexOf("'".concat(_key, "'"), searchStart);
-                if (pos == -1) {
-                    return;
-                }
-            }
-
-            pos += int(bytes(_key).length+2);
-
-            bool colon = false;
-            while (uint(pos) < bytes(_self).length) {
-                if (bytes(_self)[uint(pos)] == ' ' || bytes(_self)[uint(pos)] == '\t' 
-                    || bytes(_self)[uint(pos)] == '\r' || bytes(_self)[uint(pos)] == '\n') {
-                    pos++;
-                } else if (bytes(_self)[uint(pos)] == ':') {
-                    pos++;
-                    colon = true;
-                    break;
-                } else {
-                    break;
-                }
-            }
-
-            if(uint(pos) == bytes(_self).length) {
-                return;
-            }
-
-            if (colon) {
-                break;
-            } else {
-                searchStart = uint(pos);
-            }
-        }
-
-        int start = _self.indexOf("[", uint(pos));
-        if (start == -1) {
-            return;
-        }
-        start += 1;
-        
-        int end = _self.indexOf("]", uint(pos));
-        if (end == -1) {
-            return;
-        }
-
-        string memory vals = _self.substr(uint(start), uint(end-start)).trim(" \t\r\n");
-
-        if (bytes(vals).length == 0) {
-            return;
-        }
-        
-        vals.split(",", _array);
-
-        for (i=0; i<_array.length; ++i) {
-            _array[i] = _array[i].trim(" \t\r\n");
-            _array[i] = _array[i].trim("'\"");
-        }
+    bool positive = true;
+    if (bytes(_self)[i] == '+') {
+        positive = true;
+        i++;
+    } else if(bytes(_self)[i] == '-') {
+        positive = false;
+        i++;
     }
 
-    function keyExists(string _self, string _key) internal returns (bool _ret) {
-        int pos = _self.indexOf("\"".concat(_key, "\""));
+    for (; i<bytes(_self).length; ++i) {
+        digit = uint8(bytes(_self)[i]);
+        if (!(digit >= 0x30 && digit <= 0x39)) {
+            if (!positive) {
+                _ret = -_ret;
+            }
+            return;
+        }
+        _ret = _ret*10 + int(digit-0x30);
+    }        
+
+    if (!positive) {
+        _ret = -_ret;
+    }
+}
+
+function getArrayValueByKey(string _self, string _key) internal returns (string _ret) {
+    int pos = -1;
+    uint searchStart = 0;
+    while (true) {
+        pos = _self.indexOf("\"".concat(_key, "\""), searchStart);
         if (pos == -1) {
-            pos = _self.indexOf("'".concat(_key, "'"));
+            pos = _self.indexOf("'".concat(_key, "'"), searchStart);
             if (pos == -1) {
-                return false;
+                return;
             }
         }
 
-        return true;
+        pos += int(bytes(_key).length+2);
+
+        bool colon = false;
+        while (uint(pos) < bytes(_self).length) {
+            if (bytes(_self)[uint(pos)] == ' ' || bytes(_self)[uint(pos)] == '\t' 
+                || bytes(_self)[uint(pos)] == '\r' || bytes(_self)[uint(pos)] == '\n') {
+                    pos++;
+                } else if (bytes(_self)[uint(pos)] == ':') {
+                    pos++;
+                    colon = true;
+                    break;
+                } else {
+                    break;
+                }
+        }
+
+        if(uint(pos) == bytes(_self).length) {
+            return;
+        }
+
+        if (colon) {
+            break;
+        } else {
+            searchStart = uint(pos);
+        }
     }
 
-    function storageToUint(string _self) internal returns (uint _ret) {
-        uint len = bytes(_self).length;
-        if (len > 32) {
-            len = 32;
-        }
-        
-        _ret = 0;
-        for(uint i=0; i<len; ++i) {
-            _ret = _ret*256 + uint8(bytes(_self)[i]);
-        }
+    int start = _self.indexOf("[", uint(pos));
+    if (start == -1) {
+        return;
+    }
+    start += 1;
+
+    int end = _self.indexOf("]", uint(pos));
+    if (end == -1) {
+        return;
     }
 
-    function inArray(string _self, string[] storage _array) internal returns (bool _ret, uint _i) {
-        for (uint i=0; i<_array.length; ++i) {
-            if (_self.equals(_array[i])) {
-                return (true,i);
+    _ret = _self.substr(uint(start), uint(end-start));
+}
+
+function getArrayValueByKey(string _self, string _key, string[] storage _array) internal {
+    //Why can not use delete _array?
+    for (uint i=0; i<_array.length; ++i) {
+        delete _array[i];
+    }
+    _array.length = 0;
+
+    int pos = -1;
+    uint searchStart = 0;
+    while (true) {
+        pos = _self.indexOf("\"".concat(_key, "\""), searchStart);
+        if (pos == -1) {
+            pos = _self.indexOf("'".concat(_key, "'"), searchStart);
+            if (pos == -1) {
+                return;
             }
         }
 
-        return (false,i);
-    }
- 
-    function inArrayNoCase(string _self, string[] storage _array) internal returns (bool _ret, uint _i) {
-        for (uint i=0; i<_array.length; ++i) {
-            if (_self.equalsNoCase(_array[i])) {
-                return (true,i);
-            }
+        pos += int(bytes(_key).length+2);
+
+        bool colon = false;
+        while (uint(pos) < bytes(_self).length) {
+            if (bytes(_self)[uint(pos)] == ' ' || bytes(_self)[uint(pos)] == '\t' 
+                || bytes(_self)[uint(pos)] == '\r' || bytes(_self)[uint(pos)] == '\n') {
+                    pos++;
+                } else if (bytes(_self)[uint(pos)] == ':') {
+                    pos++;
+                    colon = true;
+                    break;
+                } else {
+                    break;
+                }
         }
-        return(false, i); 
-    }
-    
-    function addrToAsciiString(address x) internal returns (string) {
-        bytes memory s = new bytes(40);
-        for (uint i = 0; i < 20; i++) {
-            byte b = byte(uint8(uint(x) / (2**(8*(19 - i)))));
-            byte hi = byte(uint8(b) / 16);
-            byte lo = byte(uint8(b) - 16 * uint8(hi));
-            s[2*i] = toChar(hi);
-            s[2*i+1] = toChar(lo);            
+
+        if(uint(pos) == bytes(_self).length) {
+            return;
         }
-        return string(s);
+
+        if (colon) {
+            break;
+        } else {
+            searchStart = uint(pos);
+        }
     }
 
-    function toChar(byte b) internal returns (byte c) {
-        if (b < 10) return byte(uint8(b) + 0x30);
-        else return byte(uint8(b) + 0x57);
+    int start = _self.indexOf("[", uint(pos));
+    if (start == -1) {
+        return;
+    }
+    start += 1;
+
+    int end = _self.indexOf("]", uint(pos));
+    if (end == -1) {
+        return;
     }
 
-    function toUpper(string _self) internal returns (string _ret) {
-        for (uint i=0; i<bytes(_self).length; ++i) {
-            if (bytes(_self)[i] >= 'a' && bytes(_self)[i] <= 'z') {
-                bytes(_self)[i] &= ~0x20;
-            }
-        }
-        
-        _ret = _self;
+    string memory vals = _self.substr(uint(start), uint(end-start)).trim(" \t\r\n");
+
+    if (bytes(vals).length == 0) {
+        return;
     }
-    
-    function toLower(string _self) internal returns (string _ret) {
-        for (uint i=0; i<bytes(_self).length; ++i) {
-            if (bytes(_self)[i] >= 'A' && bytes(_self)[i] <= 'Z') {
-                bytes(_self)[i] |= 0x20;
-            }
-        }
-        
-        _ret = _self;
+
+    vals.split(",", _array);
+
+    for (i=0; i<_array.length; ++i) {
+        _array[i] = _array[i].trim(" \t\r\n");
+        _array[i] = _array[i].trim("'\"");
     }
+}
+
+function keyExists(string _self, string _key) internal returns (bool _ret) {
+    int pos = _self.indexOf("\"".concat(_key, "\""));
+    if (pos == -1) {
+        pos = _self.indexOf("'".concat(_key, "'"));
+        if (pos == -1) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function storageToUint(string _self) internal returns (uint _ret) {
+    uint len = bytes(_self).length;
+    if (len > 32) {
+        len = 32;
+    }
+
+    _ret = 0;
+    for(uint i=0; i<len; ++i) {
+        _ret = _ret*256 + uint8(bytes(_self)[i]);
+    }
+}
+
+function inArray(string _self, string[] storage _array) internal returns (bool _ret, uint _i) {
+    for (uint i=0; i<_array.length; ++i) {
+        if (_self.equals(_array[i])) {
+            return (true,i);
+        }
+    }
+
+    return (false,i);
+}
+
+function inArrayNoCase(string _self, string[] storage _array) internal returns (bool _ret, uint _i) {
+    for (uint i=0; i<_array.length; ++i) {
+        if (_self.equalsNoCase(_array[i])) {
+            return (true,i);
+        }
+    }
+    return(false, i); 
+}
+
+function addrToAsciiString(address x) internal returns (string) {
+    bytes memory s = new bytes(40);
+    for (uint i = 0; i < 20; i++) {
+        byte b = byte(uint8(uint(x) / (2**(8*(19 - i)))));
+        byte hi = byte(uint8(b) / 16);
+        byte lo = byte(uint8(b) - 16 * uint8(hi));
+        s[2*i] = toChar(hi);
+        s[2*i+1] = toChar(lo);            
+    }
+    return string(s);
+}
+
+function toChar(byte b) internal returns (byte c) {
+    if (b < 10) return byte(uint8(b) + 0x30);
+    else return byte(uint8(b) + 0x57);
+}
+
+function toUpper(string _self) internal returns (string _ret) {
+    for (uint i=0; i<bytes(_self).length; ++i) {
+        if (bytes(_self)[i] >= 'a' && bytes(_self)[i] <= 'z') {
+            bytes(_self)[i] &= ~0x20;
+        }
+    }
+
+    _ret = _self;
+}
+
+function toLower(string _self) internal returns (string _ret) {
+    for (uint i=0; i<bytes(_self).length; ++i) {
+        if (bytes(_self)[i] >= 'A' && bytes(_self)[i] <= 'Z') {
+            bytes(_self)[i] |= 0x20;
+        }
+    }
+
+    _ret = _self;
+}
+
+    function bytes32ToString(bytes32 x) internal constant returns (string) 
+    {
+         bytes memory bytesString = new bytes(32);
+         uint charCount = 0;
+         for (uint j = 0; j < 32; j++) 
+         {
+
+             byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
+             if (char != 0) 
+                 {
+
+                     bytesString[charCount] = char;
+                     charCount++;
+                 }
+         }
+         bytes memory bytesStringTrimmed = new bytes(charCount);
+         for (j = 0; j < charCount; j++) 
+         {
+
+             bytesStringTrimmed[j] = bytesString[j];
+         }
+         return string(bytesStringTrimmed);
+    }
+
   }

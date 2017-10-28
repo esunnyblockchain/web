@@ -60,7 +60,7 @@ contract TestMarket
                 lev_id, 
                 wh_id, 
                 place_id);
-            var id = market.insertMarket_2(
+            var (id,date) = market.insertMarket_2(
                 price, 
                 list_qty, 
                 deal_qty,
@@ -80,7 +80,7 @@ contract TestMarket
                 lev_id, 
                 wh_id, 
                 place_id);
-            var id = market.insertMarket_2(
+            var (id,date) = market.insertMarket_2(
                 price, 
                 list_qty, 
                 deal_qty,
@@ -101,7 +101,7 @@ contract TestMarket
                 lev_id, 
                 wh_id, 
                 place_id);
-            var id = market.insertMarket_2(
+            var (id,date) = market.insertMarket_2(
                 price, 
                 list_qty, 
                 deal_qty,
@@ -127,7 +127,7 @@ contract TestMarket
                         lev_id, 
                         wh_id, 
                         place_id);
-        var id = market.insertMarket_2(
+        var (id,date) = market.insertMarket_2(
                         price, 
                         list_qty, 
                         deal_qty,
@@ -148,7 +148,7 @@ contract TestMarket
                         lev_id, 
                         wh_id, 
                         place_id);
-        var id = market.insertMarket_2(
+        var (id,date) = market.insertMarket_2(
                         price, 
                         list_qty, 
                         deal_qty,

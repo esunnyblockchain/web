@@ -12,7 +12,7 @@ library LibTradeMap
         uint[] keyIndex;
     }
 
-    function insert1(TradeMap storage self, uint k, StructTrade.value v)  internal returns (bool replaced)
+    function insert(TradeMap storage self, uint k, StructTrade.value v)  internal returns (bool replaced)
     {
         replaced = true;
         if(self.data[k].user_id_ == "")

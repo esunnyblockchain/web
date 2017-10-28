@@ -13,6 +13,7 @@ contract UserList
     {
         user_map.insert(user_id, StructUserAddr.value(external_addr, agent_addr, user_id, user_auth));
     }
+
     function getUserInfo(bytes32 user_id) returns(address external_addr, address agent_addr, bytes32 ret_user_id, int user_auth)
     {
         user_addr    = user_map.getValue(user_id);
@@ -21,6 +22,7 @@ contract UserList
         ret_user_id             = user_addr.user_id_;
         user_auth               = user_addr.user_auth_;
     }
+
     function getUserAgentAddr(bytes32 user_id) returns(address agent_addr)
     {
         user_addr    = user_map.getValue(user_id);
