@@ -40,61 +40,47 @@ var meta_createID
 
 
 window.App = {
-  init: function(){
+  init: async function(){
     User.setProvider(web3.currentProvider);
     CreateID.setProvider(web3.currentProvider);
     UserList.setProvider(web3.currentProvider);
     ContractAddress.setProvider(web3.currentProvider);
     //获取合约地址
     Market.setProvider(web3.currentProvider);
-    Market.deployed().then(function(instance){
-        meta_market = instance;
-        market_addr = meta_market.address;
-        meta_market.setCreateIDName.sendTransaction("CreateID",{from:account, gas:300000});
-        meta_market.setUserListName.sendTransaction("UserList",{from:account, gas:300000});  
+    
+    meta_market = await Market.deployed();
+    market_addr = meta_market.address;
+    await meta_market.setCreateIDName.sendTransaction("CreateID",{from:account, gas:300000});
+    await meta_market.setUserListName.sendTransaction("UserList",{from:account, gas:300000});  
         
-        CreateID.deployed().then(function(instance){
-        meta_createID = instance;
-        console.log("DEBUG=====");
-        console.log(meta_createID);
-        createID_addr = meta_createID.address;
-        console.log("createID_addr=====:"+createID_addr);
+    meta_createID = await CreateID.deployed();
+    createID_addr = meta_createID.address;
         
-        //DEBUG:marketID是否初始化
-        meta_createID.getMarketID.call().then(function(ret){
-            console.log("marketID:"+ret);
-        });
-        UserList.deployed().then(function(instance){
-            meta_userList = instance;
-            userList_addr = meta_userList.address;   
-            console.log("userList:"+userList_addr);
-            ContractAddress.deployed().then(function(instance){
-                meta_contractAddr = instance;
-                console.log(meta_contractAddr);
-                contract_addr = meta_contractAddr.address;
-                //debug
-                console.log("contract_addr:"+contract_addr);
-                console.log("createID_addr:"+createID_addr); 
-                console.log("market_addr:"+market_addr);
-                console.log("userList_addr:"+userList_addr);
-                //记录合约地址
-                meta_contractAddr.setContractAddress.sendTransaction("Market", market_addr,{from:account, gas:300000});
-                meta_contractAddr.setContractAddress.sendTransaction("CreateID", createID_addr,{from:account, gas:300000});
-                meta_contractAddr.setContractAddress.sendTransaction("UserList", userList_addr,{from:account, gas:300000});
+    //DEBUG:marketID是否初始化
+    var ret = await meta_createID.getMarketID.call();
+    console.log("marketID:"+ret);
+   
+    meta_userList = await UserList.deployed();
+    userList_addr = meta_userList.address;   
+    console.log("userList:"+userList_addr);
+    
+    meta_contractAddr = await ContractAddress.deployed();
+    contract_addr = meta_contractAddr.address;
+    
+    //debug
+    console.log("contract_addr:"+contract_addr);
+    console.log("createID_addr:"+createID_addr); 
+    console.log("market_addr:"+market_addr);
+    console.log("userList_addr:"+userList_addr);
+    //记录合约地址
+    await meta_contractAddr.setContractAddress.sendTransaction("Market", market_addr,{from:account, gas:300000});
+    await meta_contractAddr.setContractAddress.sendTransaction("CreateID", createID_addr,{from:account, gas:300000});
+    await meta_contractAddr.setContractAddress.sendTransaction("UserList", userList_addr,{from:account, gas:300000});
        
-                //Market设置合约地址 
-                Market.deployed().then(function(instance){
-                    instance.setContractAddress.sendTransaction(contract_addr,{from:account, gas:300000});
-                });
-            });
-          });
-        });
-    });
+    //Market设置合约地址 
+    await meta_market.setContractAddress.sendTransaction(contract_addr,{from:account, gas:300000});
+  },
   
- 
-  },
-  createUser: function(){
-  },
   start: function() {
     var self = this;
 
@@ -123,7 +109,7 @@ window.App = {
   },
 
 
-  createReceipt: function(){
+  createReceipt: async function(){
     var self = this;
     var user_id = document.getElementById("userid").value;
 
@@ -152,36 +138,28 @@ window.App = {
     var available_amount = parseInt(document.getElementById("availableamount").value);
     console.log(receipt_amount);
 
-    User.new({from:account,gas:7000000}).then(function(instance){
-        console.log(instance);
-        meta_user = instance;
-        user_addr = meta_user.address;
-        console.log("user_addr:"+user_addr);
-        //关联合约Map地址
-        ContractAddress.deployed().then(function(ret){
-            meta_user.setContractAddress.sendTransaction(ret.address, {from:account,gas:300000})
-        });
-       // 登记MarketName, CreateIDName,UserListName,UserID
-        meta_user.setMarketName.sendTransaction("Market", {from:account, gas:300000});
-        meta_user.setCreateIDName.sendTransaction("CreateID", {from:account,gas:300000});
-        meta_user.setUserListName.sendTransaction("UserList", {from:account, gas:300000});
-        meta_user.setUserID.sendTransaction(user_id,{from:account, gas:300000});
-        //登记到userlist
-       UserList.deployed().then(function(instance){
-     
-            instance.addUser.sendTransaction(user_addr, user_addr,user_id,1,{from:account, gas:300000});
-        });
-        meta_user.insertSheet.sendTransaction(user_id, asscii_class_id, ascii_make_date,  ascii_lev_id, ascii_whe_id, ascii_palce_id, receipt_amount,frozen_amount,available_amount,{from:account, gas:70000000}).then(function(){
-            meta_createID.getSheetID.call().then(function (ret){
-                var id = ret - 1;
-                console.log("InserSheet sheet_id:"+id);
-                meta_user.getSheetAmount.call(id).then(function(ret){self.setStatus('Receipt Amount:'+ret[0]+',Avaliable_amount:'+ret[1]+',Frozen_amount:'+ret[2]);}); 
-            });
-            meta_contractAddr.getContractAddress.call("CreateID").then(function(ret){console.log(" in CreateID:"+ret);});
-        });
-    });
-    
-  }  
+    meta_user = await User.new({from:account,gas:7000000});
+    user_addr = meta_user.address;
+    console.log("new user_addr:"+user_addr);
+    //关联合约Map地址
+    await meta_user.setContractAddress.sendTransaction(contract_addr, {from:account,gas:300000});
+    // 登记MarketName, CreateIDName,UserListName,UserID
+    await meta_user.setMarketName.sendTransaction("Market", {from:account, gas:300000});
+    await meta_user.setCreateIDName.sendTransaction("CreateID", {from:account,gas:300000});
+    await meta_user.setUserListName.sendTransaction("UserList", {from:account, gas:300000});
+    await meta_user.setUserID.sendTransaction(user_id,{from:account, gas:300000});
+
+    //登记到userlist
+    await meta_userList.addUser.sendTransaction(user_addr, user_addr,user_id,1,{from:account, gas:300000});
+    //录入用户仓单
+    await meta_user.insertSheet.sendTransaction(user_id, asscii_class_id, ascii_make_date,  ascii_lev_id, ascii_whe_id, ascii_palce_id, receipt_amount,frozen_amount,available_amount,{from:account, gas:70000000});
+
+    var ret = await meta_createID.getSheetID.call();
+    var id = ret - 1;
+    console.log("InserSheet sheet_id:"+id);
+    ret = await meta_user.getSheetAmount.call(id);
+    self.setStatus('Receipt Amount:'+ret[0]+',Avaliable_amount:'+ret[1]+',Frozen_amount:'+ret[2]);
+   }
 };
 
 window.addEventListener('load', function() {
