@@ -155,7 +155,7 @@ window.App = {
     await self.eventTrigger();
     global_market_id++;
   },
-
+  //<事件函数
   eventTrigger:async function(){
     var self =this;
     console.log("eventTrigger !!!!");
@@ -193,73 +193,32 @@ window.App = {
   },
 
   //<展示我的挂单  
-   myList: function(){
-        document.getElementById("listReceipt").style.display="block";
+   myList: async function(){
+        document.getElementById("myList").style.display="block";
         document.getElementById("myTrade").style.display="none";
         document.getElementById("myReceipt").style.display="none";
-        var table = document.getElementById("taReceipt");
+        var table = document.getElementById("taList");
         //每次点击都会清空tbody
         var tBody = table.tBodies[0];
         tBody.parentNode.outerHTML = tBody.parentNode.outerHTML.replace(tBody.innerHTML, "");  
-        
-        //创建table元素
-        var tr = document.createElement('tr');
-        var td_opt = document.createElement('td');
-        td_opt.innerHTML = "操作";
-        tr.appendChild(td_opt);
 
-        var td_id = document.createElement('td');
-        td_id.innerHTML= "委托编号";
-        tr.appendChild(td_id);
-
-        var td_date = document.createElement('td');
-        td_date.innerHTML = "交易日期";
-        tr.appendChild(td_date);
-
-        var td_classid = document.createElement('td');
-        td_classid.innerHTML = "品种";
-        tr.appendChild(td_classid);
-
-        var td_makedate = document.createElement('td');
-        td_makedate.innerHTML="产期";
-        tr.appendChild(td_makedate);
-
-        var td_lev = document.createElement('td');
-        td_lev.innerHTML = "等级";
-        tr.appendChild(td_lev);
-
-        var td_buyOrsell = document.createElement('td');
-        td_buyOrsell.innerHTML= "买卖";
-        tr.appendChild(td_buyOrsell);
-
-        var td_price = document.createElement("买卖");
-        td_price.innerHTML = "价格";
-        tr.appendChild(td_price);
-
-        var td_amount = document.createElement("td");
-        td_amount.innerHTML = "挂牌量";
-        tr.appendChild(td_amount);
-
-        var td_remainAmount = document.createElement('td');
-        td_remainAmount.innerHTML = "剩余量";
-        tr.appendChild(td_remainAmount);
-
-        var td_dealAmount = document.createElement('td');
-        td_dealAmount.innerHTML = "成交量";
-        tr.appendChild(td_dealAmount);
-
-        var td_deadline = document.createElement('td');
-        td_deadline.innerHTML = "挂单到期日";
-        tr.appendChild(td_deadline);
-
-        table.tBodies[0].appendChild(tr);
+        //获取我的挂单数量
+        var num = await user_instance.getListReqNum.call();
+        console.log("myList num:"+num);
+        //显示我的挂单
+        for (var index = 0; index < num; index++)
+        {
+            var ret = await user_instance.getListReq.call(index);
+            //添加我的挂单
+            App.addMyList(ret[1],ret[2],ret[3],ret[4],ret[5],"卖出",ret[6],ret[7],ret[9],ret[8],"deadline");
+        }
         
     },
     //<展示我的合同
     myTrade :function(){
        //获取table实例
        document.getElementById("myTrade").style.display="block";
-       document.getElementById("listReceipt").style.display="none";
+       document.getElementById("myList").style.display="none";
        document.getElementById("myReceipt").style.display="none";
        var table = document.getElementById("taTrade");
     },
@@ -268,7 +227,7 @@ window.App = {
       var self = this;
       document.getElementById("myReceipt").style.display="block";
       document.getElementById("myTrade").style.display="none";
-      document.getElementById("listReceipt").style.display="none";
+      document.getElementById("myList").style.display="none";
       var table = document.getElementById("taMyReceipt");
       //每次点击都会清空tbody
       var tBody = table.tBodies[0];
@@ -302,10 +261,61 @@ window.App = {
         self.addmyReceipt(user_id, sheet_id, class_id, make_date, lev_id, whe_id, place_id, all_amount, avail_amount, frozen_amount);
    }
   },
-    //填充taReceipt表
+    //填充taList表
     //参数：委托编号(挂单编号),委托日期(挂单日期),等级,产期,等级,买卖,价格,挂牌量,剩余量,成交量,挂牌到期日
-    addListReceipt: function(market_id, trade_date,class_id, make_date, lev_id, buyorsell, price, list_qty, rem_qty, deal_qty, dead_line){
-      
+    addMyList: function(market_id, trade_date,class_id, make_date, lev_id, buyorsell, price, list_qty, rem_qty, deal_qty, dead_line){
+        var table = document.getElementById("taList");
+        var tr = document.createElement('tr');
+
+        var td_opt = document.createElement('td');
+        td_opt.innerHTML = "撤单";
+        tr.appendChild(td_opt);
+
+        var td_id = document.createElement('td');
+        td_id.innerHTML= market_id;
+        tr.appendChild(td_id);
+
+        var td_date = document.createElement('td');
+        td_date.innerHTML = trade_date;
+        tr.appendChild(td_date);
+
+        var td_classid = document.createElement('td');
+        td_classid.innerHTML = class_id;
+        tr.appendChild(td_classid);
+
+        var td_makedate = document.createElement('td');
+        td_makedate.innerHTML= make_date;
+        tr.appendChild(td_makedate);
+
+        var td_lev = document.createElement('td');
+        td_lev.innerHTML = lev_id;
+        tr.appendChild(td_lev);
+
+        var td_buyOrsell = document.createElement('td');
+        td_buyOrsell.innerHTML= buyorsell;
+        tr.appendChild(td_buyOrsell);
+
+        var td_price = document.createElement("td");
+        td_price.innerHTML = price;
+        tr.appendChild(td_price);
+
+        var td_amount = document.createElement("td");
+        td_amount.innerHTML = list_qty;
+        tr.appendChild(td_amount);
+
+        var td_remainAmount = document.createElement('td');
+        td_remainAmount.innerHTML = rem_qty;
+        tr.appendChild(td_remainAmount);
+
+        var td_dealAmount = document.createElement('td');
+        td_dealAmount.innerHTML = deal_qty;
+        tr.appendChild(td_dealAmount);
+
+        var td_deadline = document.createElement('td');
+        td_deadline.innerHTML = dead_line;
+        tr.appendChild(td_deadline);
+
+        table.tBodies[0].appendChild(tr); 
     }, 
 
     //填充taTrade表
