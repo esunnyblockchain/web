@@ -27,6 +27,11 @@ var userList_instance;
 
 var global_market_id;//全局行情id
 
+//防止重复点击按钮重复显示行情
+var mutex_myReceipt = 0;
+var mutex_myList = 0;
+var mutex_myTrade = 0;
+
 window.App = {
   start: async function() {
     var self = this;
@@ -197,22 +202,28 @@ window.App = {
         document.getElementById("myList").style.display="block";
         document.getElementById("myTrade").style.display="none";
         document.getElementById("myReceipt").style.display="none";
-        var table = document.getElementById("taList");
-        //每次点击都会清空tbody
-        var tBody = table.tBodies[0];
-        tBody.parentNode.outerHTML = tBody.parentNode.outerHTML.replace(tBody.innerHTML, "");  
 
-        //获取我的挂单数量
-        var num = await user_instance.getListReqNum.call();
-        console.log("myList num:"+num);
-        //显示我的挂单
-        for (var index = 0; index < num; index++)
+        if (!mutex_myList)
         {
-            var ret = await user_instance.getListReq.call(index);
-            //添加我的挂单
-            App.addMyList(ret[1],ret[2],ret[3],ret[4],ret[5],"卖出",ret[6],ret[7],ret[9],ret[8],"deadline");
-        }
-        
+            //每次点击都会清空tbody
+            var table = document.getElementById("taList");
+            var tBody = table.tBodies[0];
+            tBody.parentNode.outerHTML = tBody.parentNode.outerHTML.replace(tBody.innerHTML, "");  
+            //加锁
+            mutex_myList = 1;
+            //获取我的挂单数量
+            var num = await user_instance.getListReqNum.call();
+            console.log("myList num:"+num);
+            //显示我的挂单
+            for (var index = 0; index < num; index++)
+            {
+                var ret = await user_instance.getListReq.call(index);
+                //添加我的挂单
+                App.addMyList(ret[1],ret[2],ret[3],ret[4],ret[5],"卖出",ret[6],ret[7],ret[9],ret[8],"deadline");
+            }
+            //解锁
+            mutex_myList = 0;
+       } 
     },
     //<展示我的合同
     myTrade :function(){
@@ -229,37 +240,44 @@ window.App = {
       document.getElementById("myTrade").style.display="none";
       document.getElementById("myList").style.display="none";
       var table = document.getElementById("taMyReceipt");
-      //每次点击都会清空tbody
-      var tBody = table.tBodies[0];
-      tBody.parentNode.outerHTML = tBody.parentNode.outerHTML.replace(tBody.innerHTML, "");  
-      //数据参数
-      var user_id = "User";
       //获取map长度
-      var len = await user_instance.getSheetMapNum.call();
-      console.log("sheetMap len:"+len);
-      for (var index = 0; index < len; index++)
+      if (!mutex_myReceipt)
       {
-        var result = await user_instance.getSheetMap_1.call(index);
-        var sheet_id = result[1];
-        console.log("class_id:"+result[2]);
-        var class_id = result[2];
-        console.log("make_date:"+result[3]);
-        var make_date = result[3];
-        console.log("lev_id:"+result[4]);
-        var lev_id = result[4];
-        console.log("whe_id:"+result[5]);
-        var whe_id = result[5];
-        console.log("place_id:"+result[6]);
-        var place_id = result[6];
-        result = await user_instance.getSheetMap_2.call(index);
-        var all_amount = result[0];
-        console.log("all_amount:"+all_amount);
-        var avail_amount = result[1];
-        console.log("avail_amount:"+avail_amount);
-        var frozen_amount = result[2];
-        console.log("frozen_amount:"+frozen_amount);
-        self.addmyReceipt(user_id, sheet_id, class_id, make_date, lev_id, whe_id, place_id, all_amount, avail_amount, frozen_amount);
-   }
+        //每次点击都会清空tbody
+        var tBody = table.tBodies[0];
+        tBody.parentNode.outerHTML = tBody.parentNode.outerHTML.replace(tBody.innerHTML, "");  
+        //数据参数
+        var user_id = "User";
+        //加锁
+        mutex_myReceipt = 1;
+        var len = await user_instance.getSheetMapNum.call();
+        console.log("sheetMap len:"+len);
+        for (var index = 0; index < len; index++)
+        {
+            var result = await user_instance.getSheetMap_1.call(index);
+            var sheet_id = result[1];
+            console.log("class_id:"+result[2]);
+            var class_id = result[2];
+            console.log("make_date:"+result[3]);
+            var make_date = result[3];
+            console.log("lev_id:"+result[4]);
+            var lev_id = result[4];
+            console.log("whe_id:"+result[5]);
+            var whe_id = result[5];
+            console.log("place_id:"+result[6]);
+            var place_id = result[6];
+            result = await user_instance.getSheetMap_2.call(index);
+            var all_amount = result[0];
+            console.log("all_amount:"+all_amount);
+            var avail_amount = result[1];
+            console.log("avail_amount:"+avail_amount);
+            var frozen_amount = result[2];
+            console.log("frozen_amount:"+frozen_amount);
+            await self.addmyReceipt(user_id, sheet_id, class_id, make_date, lev_id, whe_id, place_id, all_amount, avail_amount, frozen_amount);
+       }
+       //解锁
+      mutex_myReceipt = 0;
+    }
   },
     //填充taList表
     //参数：委托编号(挂单编号),委托日期(挂单日期),等级,产期,等级,买卖,价格,挂牌量,剩余量,成交量,挂牌到期日
