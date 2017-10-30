@@ -33,6 +33,22 @@ var mutex_myList = 0;
 var mutex_myTrade = 0;
 
 window.App = {
+  //<系统时间戳转为yyyymmdd
+  transTimeStamp: function(time){
+    var date = new Date(time*1000);
+    var year = date.getFullYear();
+    var month = date.getMonth()+1;
+    console.log("month:"+month);
+    var day = date.getDate();
+    var yyyymmdd = year.toString();
+    if(month < 10)
+        yyyymmdd += "0";
+    yyyymmdd +=month.toString();
+    if (day < 10)
+        yyyymmdd+= "0";
+    yyyymmdd += day.toString();
+    return yyyymmdd;
+  },
   start: async function() {
     var self = this;
     User.setProvider(web3.currentProvider);
@@ -219,7 +235,7 @@ window.App = {
             {
                 var ret = await user_instance.getListReq.call(index);
                 //添加我的挂单
-                App.addMyList(ret[1],ret[2],ret[3],ret[4],ret[5],"卖出",ret[6],ret[7],ret[9],ret[8],"deadline");
+                App.addMyList(ret[1],App.transTimeStamp(ret[2]),ret[3],ret[4],ret[5],"卖出",ret[6],ret[7],ret[9],ret[8],"deadline");
             }
             //解锁
             mutex_myList = 0;
@@ -402,36 +418,23 @@ window.App = {
      td_index.setAttribute("text-align", "center");
      tr.appendChild(td_index);
 
-     //插入date
+     //插入挂牌日期
      var td_date = document.createElement('td');
-     /*
-     var now = new Date();
-     var year = now.getFullYear();
-     var month = now.getMonth();
-     var day = now.getDate();
-     var time = year;
-     if(month < 10)
-             time += "0";
-     time +=month;
-     if (day < 10)
-             time += "0";
-     time += day;
+     var time = App.transTimeStamp(date);
      td_date.innerHTML = time;
-     */
-     td_date.innerHTML = date;
      tr.appendChild(td_date);
 
-     //插入market_id
+     //插入挂牌编号
      var td_list_id = document.createElement('td');
      td_list_id.innerHTML = market_id;
      tr.appendChild(td_list_id);
 
-     //插入 sheet_id
+     //插入仓单编号 sheet_id
      var td_sheet_id = document.createElement('td');
      td_sheet_id.innerHTML = sheet_id;
      tr.appendChild(td_sheet_id);
 
-     //插入class_id
+     //插入等级 class_id
      var td_class_id = document.createElement('td');
      td_class_id.innerHTML = class_id;
      tr.appendChild(td_class_id);
