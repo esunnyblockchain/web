@@ -295,6 +295,25 @@ window.App = {
       mutex_myReceipt = 0;
     }
   },
+    //<撤单
+    withdrawList: function(column){
+        var tr = column.parentNode;
+        console.log("rowIndex:"+tr.cells[0].innerHTML);
+        var ret = confirm("挂牌编号:"+tr.cells[1].innerHTML+" 挂牌日期:"+tr.cells[2].innerHTML+" 价格:"+tr.cells[7].innerHTML+" 挂牌量:"+tr.cells[8].innerHTML+" 成交量:"
+              +tr.cells[9].innerHTML+" 剩余量:"+tr.cells[10].innerHTML);
+        if(ret == true)
+        {
+            //我的挂单删除行
+            document.getElementById('taList').deleteRow(tr.rowIndex);
+            //TODO 调用智能合约删除该条挂牌请求;
+            //TODO 市场行情也删除,根据marketID删除市场行情
+            console.log("确认撤单！！！");
+        }
+        else
+        {
+            console.log("不撤了!!!");
+        }
+    },
     //填充taList表
     //参数：委托编号(挂单编号),委托日期(挂单日期),等级,产期,等级,买卖,价格,挂牌量,剩余量,成交量,挂牌到期日
     addMyList: function(market_id, trade_date,class_id, make_date, lev_id, buyorsell, price, list_qty, rem_qty, deal_qty, dead_line){
@@ -304,7 +323,7 @@ window.App = {
         var td_opt = document.createElement('td');
         td_opt.innerHTML = "撤单";
         tr.appendChild(td_opt);
-
+        td_opt.setAttribute("onclick","App.withdrawList(this)"); 
         var td_id = document.createElement('td');
         td_id.innerHTML= market_id;
         tr.appendChild(td_id);
@@ -405,9 +424,56 @@ window.App = {
        tr.appendChild(td_frozenamount);
        table.tBodies[0].appendChild(tr);
     },
+
+
+    //<摘牌弹出框
+    popBox: function(column){ 
+        var tr = column.parentNode;
+        var market_id = tr.cells[2].innerHTML;
+        console.log("popBox MarketID:"+market_id);
+
+        var delWindow = window.open("", "delWin", "height=250, width=280,toolbar=no, location=no,resizable=no");
+        delWindow.document.write("<html>");
+        delWindow.document.write("<title>delisting</title>");
+        delWindow.document.write("<body>");
+        delWindow.document.write("<h1 align=\"center\">摘牌</h1>");
+        delWindow.document.write("<table border=\"0\">");
+        delWindow.document.write("<tr><td><lable>买方ID:</lable></td><td><input type=\"text\" id =\"userid\" /></td></tr>");
+        delWindow.document.write("<tr><td><lable>挂牌编号:</lable></td><td><input type=\"text\" id=\"marketid\" /></td></tr>");
+        delWindow.document.write("<tr><td><lable>数量:</lable></td><td><input type=\"text\" id=\"amount\"></input></td></tr>");
+        delWindow.document.write("</table>");
+        delWindow.document.write("<br><input type=\"button\" id=\"confirm\" name=\"confirm\"value=\"确定\" />");
+        delWindow.document.write("</body>");
+        delWindow.document.write("</html>");
+        delWindow.document.close();
+        //设置买方ID和摘牌数量
+        var obj = delWindow.document.getElementById("userid");
+        obj.setAttribute("value","User");
+        obj = delWindow.document.getElementById("marketid");
+        obj.setAttribute("value", market_id);
+        
+        var buy_user_id = "User";
+        delWindow.document.getElementById("confirm").onclick=function(){
+                var amount =  parseInt(delWindow.document.getElementById("amount").value);
+                App.delisting(column, buy_user_id, market_id, amount); 
+            };
+    },
+
+    //<摘牌
+    delisting: async function(column,buy_user_id,market_id, amount){
+        console.log("delisting!!!!");
+        console.log("挂牌序号:"+market_id);
+        console.log("摘牌数量:"+amount);
+        console.log(user_instance); 
+        console.log("account:"+account);
+        
+        //设置资金
+        await user_instance.insertFunds.sendTransaction(900000,{from:account, gas:9000000});
+        //调用智能合约进行摘牌
+        var ret = await user_instance.delistRequest.sendTransaction(buy_user_id, market_id, amount,{from:account, gas:900000});
+    },
     //<填充市场行情表单
 	addTr: function(date,market_id, sheet_id, class_id, mkdate, lev, whe_id, place_id, price_type, price, list_qty, deal_qty, rem_qty, deadline, dlv_uint){
-
      //获取table实例
      var table = document.getElementById("addRow");
      //定义行元素
@@ -427,6 +493,7 @@ window.App = {
      //插入挂牌编号
      var td_list_id = document.createElement('td');
      td_list_id.innerHTML = market_id;
+     td_list_id.setAttribute("onclick","App.popBox(this)");
      tr.appendChild(td_list_id);
 
      //插入仓单编号 sheet_id
