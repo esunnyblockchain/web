@@ -201,11 +201,14 @@ contract User
             //TODO modify deadline、dlv_unit
             var(ret_market_id,date) = market.insertMarket_2(price, sell_qty, 0, sell_qty, "deadline", 5, sheet.user_id_ );
             if(ret_market_id >0)
+            {
                     freeze(sheet_id, sell_qty);
 
-            //将挂牌数据保存到挂牌请求列表中
-            list_req.push(ListRequest(sheet_id, ret_market_id, date, sheet.class_id_, sheet.make_date_, sheet.lev_id_, price, sell_qty, 0, sell_qty)); 
-            getRet(ret_market_id);
+                    //将挂牌数据保存到挂牌请求列表中
+                    //仓单序号,挂牌编号,挂牌日期,类别,产期,等级,价格,挂牌量,剩余量,成交量,
+                    list_req.push(ListRequest(sheet_id, ret_market_id, date, sheet.class_id_, sheet.make_date_, sheet.lev_id_, price, sell_qty, sell_qty,0)); 
+                    getRet(ret_market_id);
+            }
             return ret_market_id;
     }
 
