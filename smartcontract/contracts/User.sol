@@ -16,7 +16,7 @@ import "./lib/LibString.sol";
 
 contract User
 {
-    event getRet(uint ret);
+    event getRet(uint indexed ret);
     //挂牌请求数据结构
     struct ListRequest
     {

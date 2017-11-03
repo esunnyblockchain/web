@@ -10,7 +10,7 @@ import "./lib/LibString.sol";
  
 contract  Market
 {
-    event getRet(uint ret);
+    event getRet(uint indexed ret);
     using LibMarketMap for LibMarketMap.MarketMap;
 
     LibMarketMap.MarketMap  market_map;

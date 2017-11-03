@@ -94,7 +94,15 @@ window.App = {
       if (now_market_id > local_market_id)
       {
         //market_id落后就同步
-         App.eventTrigger();
+        //方案1
+        /*
+        App.eventTrigger();
+        */
+        //方案2
+        var ret_1 = await market_instance.getMarketStrByMarketID_1.call(local_market_id);
+        var ret_2 = await market_instance.getMarketStrByMarketID_2.call(local_market_id);
+        App.addTr(ret_1[0],ret_1[1],ret_1[2],ret_1[3],ret_1[4],ret_1[5], ret_1[6], ret_1[7],"yiloujia",ret_2[0],ret_2[1],ret_2[2],ret_2[3],ret_2[4],ret_2[5]);
+        local_market_id++;
       }
   },
   
@@ -174,6 +182,7 @@ window.App = {
     console.log("eventTrigger !!!!");
     var onlyone = 0;
     var event = await market_instance.getRet();
+    console.log(event);
     event.watch(async function(error, result){
         if (!error&!onlyone)
         {
