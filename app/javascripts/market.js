@@ -158,6 +158,7 @@ window.App = {
             if (!rem_qty)
             {
                 table.deleteRow(i);
+                App.updateSeq();
             }
             else
             {
@@ -175,6 +176,16 @@ window.App = {
       }
   },
  
+  //删除行时，更新行情序号
+  updateSeq: function(){
+    var table = document.getElementById("taMarketList");
+    for (var i = 1; i < table.rows.length; i++)
+    {
+        table.rows[i].cells[0].innerHTML = i;
+    }
+    rowseq = table.rows.length+1;
+  },
+
   //显示市场行情
   listMarket: async function(){
       var self = this;
