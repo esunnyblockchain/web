@@ -11,10 +11,13 @@ import "./lib/LibString.sol";
 contract  Market
 {
     event getRet(uint indexed ret);
+    //更新行情事件
+    event updateEvent(uint indexed seq, uint indexed market_id, uint indexed  amount);
     using LibMarketMap for LibMarketMap.MarketMap;
 
     LibMarketMap.MarketMap  market_map;
 
+    uint                    opt_seq;
     StructMarket.value      temp_market; //临时行情变量
     uint                    market_id;
 
@@ -22,6 +25,11 @@ contract  Market
 
     string                  create_id_name;
     string                  user_list_name;
+    //获取同步操作序号
+    function get_opt_seq() returns(uint)
+    {
+        return opt_seq;
+    }
     
     //外部依赖
     function setContractAddress(address addr)
@@ -174,6 +182,8 @@ contract  Market
         temp_market = market_map.getValue(selected_market_id);
         if(temp_market.rem_qty_ != 0 && confirm_qty != 0 && confirm_qty <= temp_market.rem_qty_)
         {
+            //获得操作序号
+            opt_seq++;
             market_map.update(selected_market_id, temp_market.deal_qty_ + confirm_qty, temp_market.rem_qty_ - confirm_qty);
             if(confirm_qty == temp_market.rem_qty_) //确认量等于挂牌量，删除该条行情
             {
@@ -209,7 +219,8 @@ contract  Market
         { 
             market_map.remove(selected_market_id);
         }
-
+        //记录下更新事件
+        updateEvent(opt_seq, selected_market_id, confirm_qty);
         return 0;
     }
 

@@ -31,6 +31,13 @@ var local_market_id;//全局行情id
 var mutex_myReceipt = 0;
 var mutex_myList = 0;
 var mutex_myTrade = 0;
+//第一次点击
+var myListFirstClick = 0;
+var myReceiptFirstClick = 0;
+
+//市场行情更新操作
+var opt_seq;
+var have = 0;
 
 window.App = {
   //<系统时间戳转为yyyymmdd
@@ -49,6 +56,7 @@ window.App = {
     yyyymmdd += day.toString();
     return yyyymmdd;
   },
+
   start: async function() {
     var self = this;
     User.setProvider(web3.currentProvider);
@@ -81,6 +89,12 @@ window.App = {
     market_instance = await Market.deployed();
     local_market_id = await market_instance.getMarketID.call();
     console.log("Start local_market_id:"+local_market_id);
+    
+    //获取opt_seq
+    var ret_seq  = await market_instance.get_opt_seq.call();
+    console.log("!!!!Start get_opt_seq:"+ret_seq);
+    opt_seq = ++ret_seq;
+    console.log("!!!!Expect opt:"+opt_seq);
 
     await self.listMarket();
     setInterval(self.syncMaket,5000); 
@@ -95,18 +109,73 @@ window.App = {
       {
         //market_id落后就同步
         //方案1
-        /*
-        App.eventTrigger();
-        */
-        //方案2
+        //App.eventTrigger();
+        //方案2 
         var ret_1 = await market_instance.getMarketStrByMarketID_1.call(local_market_id);
         var ret_2 = await market_instance.getMarketStrByMarketID_2.call(local_market_id);
         App.addTr(ret_1[0],ret_1[1],ret_1[2],ret_1[3],ret_1[4],ret_1[5], ret_1[6], ret_1[7],"yiloujia",ret_2[0],ret_2[1],ret_2[2],ret_2[3],ret_2[4],ret_2[5]);
-        local_market_id++;
+        local_market_id++; 
+      }
+      App.updateList();
+  },
+
+  //更新市场行情
+  updateList: async function(){
+    //每次调用都会建立新的过滤器,在这里限制一下
+    if(!have)
+    {
+        have++;
+        var update_event = await market_instance.updateEvent({seq:opt_seq});
+        await update_event.watch(function(error, result){
+              if (!error)
+              {
+                console.log("同步在updateList:"+result.args.market_id+" amount:"+result.args.amount);
+                var id = parseInt(result.args.market_id);
+                var amount = parseInt(result.args.amount);
+                App.updateTaMarketList(id ,amount);            
+                //等待下一个事件
+                opt_seq++;
+              }
+             update_event.stopWatching();
+             have = 0;
+         });
+     }
+  },
+
+  //根据market_id更新行情表
+  updateTaMarketList:function(market_id, amount){
+      var table = document.getElementById("taMarketList");
+      for (var i = 0; i < table.rows.length; i++)
+      {
+        //获取market_id;
+         var id = parseInt(table.rows[i].cells[2].innerHTML);
+         if (id == market_id)
+         {
+            //更新剩余量
+            var rem_qty = parseInt(table.rows[i].cells[13].innerHTML);
+            console.log("REM_QTY:"+rem_qty);
+            rem_qty -= amount;
+            if (!rem_qty)
+            {
+                table.deleteRow(i);
+            }
+            else
+            {
+                table.rows[i].cells[13].innerHTML = rem_qty;
+                //更新成交量
+                var deal_qty = parseInt(table.rows[i].cells[12].innerHTML);
+                console.log("DEAL_QTY:"+deal_qty);
+                var new_deal_qty = deal_qty + amount;
+                console.log(typeof(amount));
+                console.log("!!!!new_deal_qty:"+new_deal_qty);
+                table.rows[i].cells[12].innerHTML = new_deal_qty;
+            }
+            break;
+         }
       }
   },
-  
-  //刷新市场行情
+ 
+  //显示市场行情
   listMarket: async function(){
       var self = this;
       //检查实例
@@ -176,17 +245,16 @@ window.App = {
     var txHash = await user_instance.listRequest.sendTransaction("User",sheet_id, sheet_price, sheet_amount,{from:account, gas:9000000});
     console.log("marktet_transactionHash:"+txHash);
   },
+
   //<事件函数
   eventTrigger:async function(){
     var self =this;
     console.log("eventTrigger !!!!");
-    var onlyone = 0;
-    var event = await market_instance.getRet();
+    var event = await market_instance.getRet({formBlock:'latest',toBlock:'latest'});
     console.log(event);
-    event.watch(async function(error, result){
-        if (!error&!onlyone)
+    await event.watch(async function(error, result){
+        if (!error)
         {
-            onlyone++;
             console.log("listRequest retMarketid:"+result.args.ret);
             var retMarketid = result.args.ret;
             if (retMarketid != -1)
@@ -214,7 +282,7 @@ window.App = {
               }//if(retMarketid != -1)
            }//if
         //停止
-        event.stopWatching();
+        await event.stopWatching();
      });//event
   },
 
@@ -244,8 +312,10 @@ window.App = {
             }
             //解锁
             mutex_myList = 0;
+            //myListFirstClick++;
        } 
     },
+
     //<展示我的合同
     myTrade :function(){
        //获取table实例
@@ -253,7 +323,10 @@ window.App = {
        document.getElementById("myList").style.display="none";
        document.getElementById("myReceipt").style.display="none";
        var table = document.getElementById("taTrade");
+       //TODO: 从User.sol getTrade()获取合同
+       //TODO: addmyTrade();
     },
+
     //<展示我的仓单
     myReceipt: async function(){
       var self = this;
@@ -298,6 +371,7 @@ window.App = {
        }
        //解锁
       mutex_myReceipt = 0;
+      //myReceiptFirstClick++;
     }
   },
     //<撤单
@@ -432,8 +506,7 @@ window.App = {
 
 
     //<摘牌弹出框
-    popBox: function(column){ 
-        var tr = column.parentNode;
+    popBox: function(tr){ 
         var market_id = tr.cells[2].innerHTML;
         console.log("popBox MarketID:"+market_id);
 
@@ -460,12 +533,13 @@ window.App = {
         var buy_user_id = "User";
         delWindow.document.getElementById("confirm").onclick=function(){
                 var amount =  parseInt(delWindow.document.getElementById("amount").value);
-                App.delisting(column, buy_user_id, market_id, amount); 
+                App.delisting(tr, buy_user_id, market_id, amount); 
+                delWindow.close();
             };
     },
 
     //<摘牌
-    delisting: async function(column,buy_user_id,market_id, amount){
+    delisting: async function(tr,buy_user_id,market_id, amount){
         console.log("delisting!!!!");
         console.log("挂牌序号:"+market_id);
         console.log("摘牌数量:"+amount);
@@ -476,11 +550,16 @@ window.App = {
         await user_instance.insertFunds.sendTransaction(900000,{from:account, gas:9000000});
         //调用智能合约进行摘牌
         var ret = await user_instance.delistRequest.sendTransaction(buy_user_id, market_id, amount,{from:account,gas:9000000});
+        //更新市场行情表
+        var table = document.getElementById("taMarketList");
+        //获取剩余量
+        var rem_qty = tr.cells[13]
+            
     },
     //<填充市场行情表单
 	addTr: function(date,market_id, sheet_id, class_id, mkdate, lev, whe_id, place_id, price_type, price, list_qty, deal_qty, rem_qty, deadline, dlv_uint){
      //获取table实例
-     var table = document.getElementById("addRow");
+     var table = document.getElementById("taMarketList");
      //定义行元素
      var tr = document.createElement('tr');
      //插入index
@@ -498,7 +577,7 @@ window.App = {
      //插入挂牌编号
      var td_list_id = document.createElement('td');
      td_list_id.innerHTML = market_id;
-     td_list_id.setAttribute("onclick","App.popBox(this)");
+    // td_list_id.setAttribute("onclick","App.popBox(this)");
      tr.appendChild(td_list_id);
 
      //插入仓单编号 sheet_id
@@ -565,6 +644,7 @@ window.App = {
      var td_dlv_uint = document.createElement('td');
      td_dlv_uint.innerHTML = dlv_uint;
      tr.appendChild(td_dlv_uint);
+     tr.setAttribute("onclick","App.popBox(this)");
      table.tBodies[0].appendChild(tr);
   }	
 };
@@ -572,7 +652,7 @@ window.App = {
 window.addEventListener('load', function() {
     rowseq = 0;
     console.log("load !!!");
-	rowseq = document.getElementById("addRow").tBodies[0].rows.length + 1; 
+	rowseq = document.getElementById("taMarketList").tBodies[0].rows.length + 1; 
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
 
   if (typeof web3 !== 'undefined') {
