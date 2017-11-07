@@ -622,7 +622,7 @@ contract User
         }
     }
 	 //根据索引获取合同数据
-    function getTrade(uint it) external returns(uint trade_date, uint trade_id, uint sheet_id, string bs, uint trade_qty,string user_id,string opp_id)
+    function getTrade(uint it) external returns(uint trade_date, uint trade_id, uint sheet_id, string bs, uint price, uint trade_qty,string user_id,string opp_id)
    {
        tmp_trade = trade_map.getValueByIndex(it);
        
@@ -630,6 +630,7 @@ contract User
        trade_id     =   tmp_trade.trade_id_;
        sheet_id     =   tmp_trade.sheet_id_;
        bs           =   LibString.bytes32ToString(tmp_trade.bs_);
+       price        =   tmp_trade.price_;
        trade_qty    =   tmp_trade.trade_qty_;
        user_id      =   LibString.bytes32ToString(tmp_trade.user_id_);
        opp_id       =   LibString.bytes32ToString(tmp_trade.opp_id_);

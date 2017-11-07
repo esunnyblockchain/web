@@ -328,14 +328,30 @@ window.App = {
     },
 
     //<展示我的合同
-    myTrade :function(){
+    myTrade : async function(){
        //获取table实例
        document.getElementById("myTrade").style.display="block";
        document.getElementById("myList").style.display="none";
        document.getElementById("myReceipt").style.display="none";
-       var table = document.getElementById("taTrade");
-       //TODO: 从User.sol getTrade()获取合同
-       //TODO: addmyTrade();
+       if (!mutex_myTrade)
+       {
+            var table = document.getElementById("taTrade");
+            var tBody = table.tBodies[0];
+            tBody.parentNode.outerHTML = tBody.parentNode.outerHTML.replace(tBody.innerHTML, "");  
+            //加锁
+            mutex_myTrade = 1;
+
+            var num = await user_instance.getTradeNum.call();
+            console.log("!!!myTrade num:"+num);
+            for (var index = 0; index < num; index++)
+            {
+                var ret = await user_instance.getTrade.call(index);
+                App.addmyTrade(ret[0],ret[1],ret[2],ret[3],ret[4],ret[5],ret[6],ret[7]);
+                console.log(ret[8]);
+            }
+            //解锁
+            mutex_myTrade = 0;
+       }
     },
 
     //<展示我的仓单
@@ -463,7 +479,44 @@ window.App = {
 
     //填充taTrade表
     //参数：合同日期, 合同编号, 仓单编号, 买卖, 价格, 合同量, 手续费, 已拨货款, 剩余货款, 己方id, 对手方id, 交收状态, 交易方式
-    addmyTrade: function(trade_date, trade_id, sheet_id, buyorsell, price, trade_qty, fee, trans_money, rem_money, user_id, opp_id, trade_state, trade_type){
+    addmyTrade: function(trade_date, trade_id, sheet_id, buyorsell, price, trade_qty, user_id, opp_id){
+        var table = document.getElementById("taTrade");
+        var tr = document.createElement('tr');
+        
+        var td_date = document.createElement('td');
+        td_date.innerHTML = App.transTimeStamp(trade_date);
+        tr.appendChild(td_date);
+
+        var td_tradeid = document.createElement('td');
+        td_tradeid.innerHTML = trade_id;
+        tr.appendChild(td_tradeid);
+
+        var td_sheetid = document.createElement('td');
+        td_sheetid.innerHTML = sheet_id;
+        tr.appendChild(td_sheetid);
+
+        var td_buyorsell = document.createElement('td');
+        td_buyorsell.innerHTML = buyorsell;
+        tr.appendChild(td_buyorsell);
+
+        var td_price = document.createElement('td');
+        td_price.innerHTML = price;
+        tr.appendChild(td_price);
+
+        var td_tradeqty = document.createElement('td');
+        td_tradeqty.innerHTML = trade_qty;
+        tr.appendChild(td_tradeqty);
+
+        var td_userid = document.createElement('td');
+        td_userid.innerHTML = user_id;
+        tr.appendChild(td_userid);
+
+        var td_oppid = document.createElement('td');
+        td_oppid.innerHTML = opp_id;
+        tr.appendChild(td_oppid);
+
+        table.tBodies[0].appendChild(tr);
+
     },
 
     //填充taMyReceipt
@@ -561,12 +614,8 @@ window.App = {
         await user_instance.insertFunds.sendTransaction(900000,{from:account, gas:9000000});
         //调用智能合约进行摘牌
         var ret = await user_instance.delistRequest.sendTransaction(buy_user_id, market_id, amount,{from:account,gas:9000000});
-        //更新市场行情表
-        var table = document.getElementById("taMarketList");
-        //获取剩余量
-        var rem_qty = tr.cells[13]
-            
     },
+
     //<填充市场行情表单
 	addTr: function(date,market_id, sheet_id, class_id, mkdate, lev, whe_id, place_id, price_type, price, list_qty, deal_qty, rem_qty, deadline, dlv_uint){
      //获取table实例
