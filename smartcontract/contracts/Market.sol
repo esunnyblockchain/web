@@ -323,8 +323,3 @@ contract  Market
         seller_addr= temp_value.seller_addr_;
     }
 }
-
-
-
-
-

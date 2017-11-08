@@ -17,55 +17,45 @@
       <caption>市场行情</caption>
       <thead>
         <tr>
-          <th scope="col">#</th> 
-          <th scope="col">挂牌日期</th> 
-          <th scope="col">挂牌编号</th> 
-          <th scope="col">仓单编号</th> 
-          <th scope="col">品种代码</th> 
+          <th scope="col">#</th>
+          <th scope="col">挂牌日期</th>
+          <th scope="col">挂牌编号</th>
+          <th scope="col">仓单编号</th>
+          <th scope="col">品种代码</th>
           <th scope="col">产期</th>
-          <th scope="col">等级</th>  
-          <th scope="col">仓库代码</th> 
+          <th scope="col">等级</th>
+          <th scope="col">仓库代码</th>
           <th scope="col">产地代码</th>
-          <th scope="col">报价类型</th> 
-          <th scope="col">价格</th> 
-          <th scope="col">挂牌量</th> 
-          <th scope="col">成交量</th> 
+          <th scope="col">报价类型</th>
+          <th scope="col">价格</th>
+          <th scope="col">挂牌量</th>
+          <th scope="col">成交量</th>
           <th scope="col">剩余量</th>
-          <th scope="col">挂牌截止日期</th> 
-          <th scope="col">交割单位</th> 
+          <th scope="col">挂牌截止日期</th>
+          <th scope="col">交割单位</th>
         </tr>
       </thead>
       <tbody></tbody>
 </table>
 </div>
-<div>
-  <div class="right">
-    <li>
-    <label for="select">仓单ID:</label>
-    <input type="text" name="textfield0" id="textfield0">
-    </li>
-    <li>
-      <label for="textfield6">价格:</label>
-      <input type="text" name="textfield1" id="textfield1">
-    </li>
-    <li>
-      <label for="textfield7">数量:</label>
-      <input type="text" name="textfield2" id="textfield2">
-   </li>
-    <li>
-      <label for="textfield9">挂牌截止日期:</label>
-      <input type="text" name="textfield3" id="textfield3">
-    </li>
-<input type="button" onclick="App.listRequests()" value="挂单"></div>
+</div>
+ <div class="right">
+    <table>
+      <tr><td><label for="select">仓单ID:</label></td><td><input type="text" name="textfield0" id="textfield0"></td></tr>
+      <tr><td><label for="select">价格:</label></td><td><input type="text" name="textfield1" id="textfield1"></td></tr>
+      <tr><td><label for="textfield7">数量:</label></td><td><input type="text" name="textfield2" id="textfield2"></td></tr>
+      <tr><td><label for="textfield9">挂牌截止日期:</label></td><td><input type="text" name="textfield3" id="textfield3"></td></tr>
+      <tr><td><input type="button" onclick="App.listRequests()" value="挂单"></td></tr>
+    </table>
+  </div>
+
   <div class="left">
     <input type="button" name="button2" id="button2" value="我的挂单" onclick="App.myList()">
     <input type="button" name="button3" id="button3" value="我的合同" onclick ="App.myTrade()">
     <input type="button" name="button" id="button" value="我的仓单" onclick = "App.myReceipt()">
+    <div id=myList><table id="taList"><thead><tr><td>操作</td><td>挂牌编号</td><td>挂牌日期</td><td>品种</td><td>产期</td><td>等级</td><td>买卖</td><td>价格</td><td>挂牌量</td><td>成交量</td><td>剩余量</td><td>挂牌到期日</td></tr></thead><tbody></tbody></table></div>
+    <div id=myTrade style="display:none"><table id="taTrade"><thead><tr><td>合同日期</td><td>合同编号</td><td>仓单编号</td><td>买卖</td><td>价格</td><td>合同量</td><td>己方id</td><td>对手方id</td></tr></thead><tbody></tbody></table></div>
+    <div id=myReceipt style="display:none"><table id = "taMyReceipt"><thead><tr><td>用户id</td><td>仓单序号</td><td>品种id</td><td>产期</td><td>等级</td><td>仓库代码</td><td>产地代码</td><td>仓单总量</td><td>可用数量</td><td>冻结数量</td></tr></thead><tbody></tbody></table></div>
   </div>
-</div>
-</div>
-<div id=myList><table id="taList"><thead><tr><td>操作</td><td>挂牌编号</td><td>挂牌日期</td><td>品种</td><td>产期</td><td>等级</td><td>买卖</td><td>价格</td><td>挂牌量</td><td>成交量</td><td>剩余量</td><td>挂牌到期日</td></tr></thead><tbody></tbody></table></div>
-<div id=myTrade style="display:none"><table id="taTrade"><thead><tr><td>合同日期</td><td>合同编号</td><td>仓单编号</td><td>买卖</td><td>价格</td><td>合同量</td><td>己方id</td><td>对手方id</td></tr></thead><tbody></tbody></table></div>
-<div id=myReceipt style="display:none"><table id = "taMyReceipt"><thead><tr><td>用户id</td><td>仓单序号</td><td>品种id</td><td>产期</td><td>等级</td><td>仓库代码</td><td>产地代码</td><td>仓单总量</td><td>可用数量</td><td>冻结数量</td></tr></thead><tbody></tbody></table></div>
 </body>
 </html>
