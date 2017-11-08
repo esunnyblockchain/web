@@ -28,3 +28,4 @@ contract CreateID
         return ++market_id_;
     }
 }
+

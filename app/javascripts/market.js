@@ -25,19 +25,22 @@ var user_instance;
 var market_instance;
 var userList_instance;
 
-var local_market_id;//全局行情id
+//挂单行情同步
+var local_market_id;
+var onDelisting = 0;
+
+//市场行情更新操作
+var local_opt_seq = 0;
+var onListing = 0;
 
 //防止重复点击按钮重复显示行情
 var mutex_myReceipt = 0;
 var mutex_myList = 0;
 var mutex_myTrade = 0;
+
 //第一次点击
 var myListFirstClick = 0;
 var myReceiptFirstClick = 0;
-
-//市场行情更新操作
-var opt_seq;
-var have = 0;
 
 window.App = {
   //<系统时间戳转为yyyymmdd
@@ -90,54 +93,44 @@ window.App = {
     local_market_id = await market_instance.getMarketID.call();
     console.log("Start local_market_id:"+local_market_id);
     
-    //获取opt_seq
+    //获取local_opt_seq
     var ret_seq  = await market_instance.get_opt_seq.call();
     console.log("!!!!Start get_opt_seq:"+ret_seq);
-    opt_seq = ++ret_seq;
-    console.log("!!!!Expect opt:"+opt_seq);
+    local_opt_seq = ++ret_seq;
+    console.log("!!!!Expect opt:"+local_opt_seq);
 
     await self.listMarket();
-    setInterval(self.syncMaket,5000); 
+    setInterval(self.syncMaket,1000); 
   },
 
   //检查market_id改变时，进行同步
   syncMaket: async function(){
       var now_market_id = await market_instance.getMarketID.call();
-      console.log("sync Now MarketID:"+now_market_id);
-      console.log("sync local_market_id:"+local_market_id);
-      if (now_market_id > local_market_id)
-      {
-        //market_id落后就同步
-        //方案1
-        //App.eventTrigger();
-        //方案2 
-        var ret_1 = await market_instance.getMarketStrByMarketID_1.call(local_market_id);
-        var ret_2 = await market_instance.getMarketStrByMarketID_2.call(local_market_id);
-        App.addTr(ret_1[0],ret_1[1],ret_1[2],ret_1[3],ret_1[4],ret_1[5], ret_1[6], ret_1[7],"yiloujia",ret_2[0],ret_2[1],ret_2[2],ret_2[3],ret_2[4],ret_2[5]);
-        local_market_id++; 
-      }
-      App.updateList();
+      console.log("syncMarket  now_market_id:"+now_market_id);
+      console.log("syncMarket local_market_id:"+local_market_id);
+      App.listHook();
+      App.delistHook();
   },
 
   //更新市场行情
-  updateList: async function(){
+  delistHook: async function(){
     //每次调用都会建立新的过滤器,在这里限制一下
-    if(!have)
+    if(!onDelisting)
     {
-        have++;
-        var update_event = await market_instance.updateEvent({seq:opt_seq});
+        onDelisting++;
+        var update_event = await market_instance.updateEvent({seq:local_opt_seq},{fromBlock:0, toBlock:'latest'});
         await update_event.watch(function(error, result){
               if (!error)
               {
-                console.log("同步在updateList:"+result.args.market_id+" amount:"+result.args.amount);
+                console.log("同步在delistHook:"+result.args.market_id+" amount:"+result.args.amount);
                 var id = parseInt(result.args.market_id);
                 var amount = parseInt(result.args.amount);
                 App.updateTaMarketList(id ,amount);            
                 //等待下一个事件
-                opt_seq++;
+                local_opt_seq++;
               }
              update_event.stopWatching();
-             have = 0;
+             onDelisting = 0;
          });
      }
   },
@@ -213,8 +206,7 @@ window.App = {
         var whe_id = ret[6];
         console.log("getMarketStr_1 place_id:"+ret[7]);
         var place_id = ret[7];
-        console.log("getMarketStr_1 执行完!!!"+index);
-
+        console.log("getMarketStr_1 执行完!!!"+index); 
         var result = await market_instance.getMarketStr_2.call(index);
         var price = result[0];
         console.log("getMarket_2 price:"+result[0]);
@@ -258,11 +250,14 @@ window.App = {
   },
 
   //<事件函数
-  eventTrigger:async function(){
+  listHook:async function(){
     var self =this;
-    console.log("eventTrigger !!!!");
-    var event = await market_instance.getRet({formBlock:'latest',toBlock:'latest'});
-    console.log(event);
+    console.log("listHook !!!!");
+    console.log("onListing:"+onListing);
+    if(!onListing)
+    {
+        onListing++;
+    var event = await market_instance.getRet({ret:local_market_id},{fromBlock: 0,toBlock:'latest'});
     await event.watch(async function(error, result){
         if (!error)
         {
@@ -291,10 +286,12 @@ window.App = {
                 App.addTr(date, market_id, sheet_id, class_id,make_date, lev_id, whe_id, place_id, "yikoujia", price, list_qty,deal_qty, rem_qty, dead_line, dlv_uint);
                 local_market_id++;
               }//if(retMarketid != -1)
+              onListing = 0;
+              event.stopWatching();
            }//if
         //停止
-        await event.stopWatching();
      });//event
+    }
   },
 
   //<展示我的挂单  
@@ -574,7 +571,7 @@ window.App = {
         var market_id = tr.cells[2].innerHTML;
         console.log("popBox MarketID:"+market_id);
 
-        var delWindow = window.open("", "delWin", "height=250, width=280,toolbar=no, location=no,resizable=no");
+        var delWindow = window.open("", "delWin", "height=250, width=280,toolbar=no, location=no,resizable=no,status=no,menubar=no");
         delWindow.document.write("<html>");
         delWindow.document.write("<title>delisting</title>");
         delWindow.document.write("<body>");
