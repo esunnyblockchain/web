@@ -294,7 +294,11 @@ contract User
         int ret = -1;
         getMarketTemp_1(market_id);
         getMarketTemp_2(market_id);
-        trade_map.insert(trade_id,trade_date, opp_user_id, bs, confirm_qty,temp_market); 
+        if (bs == "买")
+            trade_map.insert(trade_id,trade_date, opp_user_id,my_user_id, bs, confirm_qty,temp_market); 
+        if (bs == "卖")
+            trade_map.insert(trade_id,trade_date, my_user_id, opp_user_id, bs, confirm_qty,temp_market); 
+            
 
         if(bs == "买")
         {

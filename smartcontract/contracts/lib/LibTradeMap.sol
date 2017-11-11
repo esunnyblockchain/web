@@ -22,7 +22,7 @@ library LibTradeMap
         }
         self.data[k] = v;
     }
-    function insert(TradeMap storage self, uint k, uint trade_date, bytes32 opp_user_id, bytes32 bs, uint confirm_qty, StructMarket.value storage market_value) internal returns (bool replaced)
+    function insert(TradeMap storage self, uint k, uint trade_date, bytes32 opp_user_id, bytes32 user_id,bytes32 bs, uint confirm_qty, StructMarket.value storage market_value) internal returns (bool replaced)
     {
         replaced = true;
         if(self.data[k].user_id_ == "")
@@ -40,7 +40,7 @@ library LibTradeMap
         //uint        transfer_money_;    //已划货款
         //uint        remainder_money_;   //剩余货款
         self.data[k].opp_id_ = opp_user_id;
-        self.data[k].user_id_ = market_value.user_id_;//TODO 根据买卖标志取自己的id
+        self.data[k].user_id_ = user_id;//TODO 根据买卖标志取自己的id
         //string      trade_state_;       //交收状态
         //string      trade_type_         //交易方式
     }
