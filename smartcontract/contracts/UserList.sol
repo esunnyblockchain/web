@@ -40,8 +40,24 @@ contract UserList
         ret_user_id             = user_addr.user_id_;
         user_auth               = user_addr.user_auth_;
     }
+
+    //获取外部账户地址
+    function getExternal_addr(bytes32 user_id) returns(address external_addr)
+    {
+        user_addr       = user_map.getValue(user_id);
+        external_addr   = user_addr.extern_addr_; 
+    }
+
+    //查询user_id 是否存在
+    function isExisted(bytes32 user_id) returns(bool ret)
+    {
+       ret = user_map.isExisted(user_id);
+    }
+
+
     function delUserInfo(bytes32 user_id)
     {
         user_map.remove(user_id);
     }
+
 }

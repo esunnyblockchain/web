@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<title>登录</title>
+<script src="./adminUser.js"></script>
+
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+</head>
+<body class="sub">
+<br />
+  <br><label for="useraddr">用户地址</label><input type="text" id="useraddr" placeholder="注：该ID需要通过管理员的审核"></input>
+  <br><label for="userid">用户ID:</label><input type="text" id="userid" placeholder="e.g., A"></input>
+  <br><label for="classid">品种代码:</label><input type="text" id="classid" placeholder="e.g.,suguar"></input>
+  <br><label for="makedate">产期:</label><input type="text" id="makeDate" placeholder="e.g.,2017"></input>
+  <br><label for="levelid">等级:</label><input type="text" id="levelid" placeholder="e.g.,lev"></input>
+  <br><label for="wheid">仓库代码:</label><input type="text" id="wheid" placeholder="e.g.,HeNan"></input>
+  <br><label for="placeID">产地代码:</label><input type="text" id="placeID" placeholder="e.g.,palceid"></input>
+  <br><label for="receiptamount">仓单数量:</label><input type="text" id="receiptamount" placeholder="e.g.,100"></input>
+  <br><label for="frozenamount">冻结仓单数量:</label><input type="text" id="frozenamount" placeholder="e.g.,100"></input>
+  <br><label for="availableamount">可用仓单数量:</label><input type="text" id="availableamount" placeholder="e.g.,100"></input>
+  <br><label for="funds">资金:</label><input type="text" id="funds" placeholder="e.g.,900000"></input>
+<br><br><button id="adduser" onclick="App.addUser()">增加用户</button>
+</body>
+</html>

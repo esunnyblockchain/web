@@ -36,7 +36,6 @@ library LibSheetMap
     {
         self.data[k].all_amount_        += qty;
         self.data[k].available_amount_  += qty;
-
     }
 
     //减少仓单
@@ -72,14 +71,14 @@ library LibSheetMap
     }
 
     //判断该种仓单是否存在
-    function isExisted(SheetMap storage self, bytes32 class_id, bytes32 make_date, bytes32 lev_id, bytes32 wh_id, bytes32 place_id) internal returns (bool)
+    function isExisted(SheetMap storage self, bytes32 class_id, bytes32 make_date, bytes32 lev_id, bytes32 wh_id, bytes32 place_id) internal returns (uint)
     {
         for(uint i = 0; i < self.keyIndex.length; i++)
         {
-            if( self.data[i].class_id_ == class_id && self.data[i].make_date_ == make_date && self.data[i].lev_id_ == lev_id && self.data[i].wh_id_ == wh_id && self.data[i].place_id_ == place_id) 
-                return true;
+            if( self.data[self.keyIndex[i]].class_id_ == class_id && self.data[self.keyIndex[i]].make_date_ == make_date && self.data[self.keyIndex[i]].lev_id_ == lev_id && self.data[self.keyIndex[i]].wh_id_ == wh_id && self.data[self.keyIndex[i]].place_id_ == place_id) 
+                return  self.data[self.keyIndex[i]].sheet_id_;
         }
-        return false;
+        return 0;
     }
 
     function empty(SheetMap storage self) internal returns (bool)

@@ -6,16 +6,20 @@ import "../contracts/ContractAddress.sol";
 import "../contracts/Market.sol";
 import "../contracts/UserList.sol";
 import "../contracts/CreateID.sol";
+import "../contracts/Admin.sol";
+
 contract TestUser
 {
 	User user;// {{{
 	UserList user_list;
 	Market market;
+    Admin admin;
 	CreateID create_id;
 	ContractAddress contract_addr;// }}}
 	string market_name;
 	string create_id_name;
 	string user_list_name;
+    string admin_name;
 	bytes32 user_id;
 	uint sheet_id;
 	uint all_amount;
@@ -43,10 +47,12 @@ contract TestUser
 		contract_addr   = new ContractAddress();
 		market          = new Market();
 		create_id       = new CreateID();
+        admin           = new Admin();
 
 		market_name     = "market";
 		create_id_name  = "create_id";
 		user_list_name  = "user_list";
+        admin_name      = "admin";
 		user_id         = "user";
 		user_a_id       = "I am user a";
 		user_b_id       = "I am user b";
@@ -54,6 +60,7 @@ contract TestUser
 		contract_addr.setContractAddress(market_name, market);
 		contract_addr.setContractAddress(create_id_name, create_id);
 		contract_addr.setContractAddress(user_list_name, user_list);
+		contract_addr.setContractAddress(admin_name, admin);
 
 		market.setContractAddress(contract_addr);
 		market.setCreateIDName(create_id_name);
@@ -68,6 +75,7 @@ contract TestUser
 		user.setCreateIDName(create_id_name);
 		user.setUserListName(user_list_name);
 		user.setUserID(user_id);
+        user.setAdmin(admin_name);
 
 		user_a.setContractAddress(contract_addr);
 		user_a.setMarketName(market_name);
@@ -75,6 +83,7 @@ contract TestUser
 		user_a.setUserListName(user_list_name);
 		user_a.setUserID(user_a_id);
         user_a.setCreateID();
+        user_a.setAdmin(admin_name);
 
 		user_b.setContractAddress(contract_addr);
 		user_b.setMarketName(market_name);
@@ -82,6 +91,7 @@ contract TestUser
 		user_b.setUserListName(user_list_name);
 		user_b.setUserID(user_b_id);
         user_b.setCreateID();
+        user_b.setAdmin(admin_name);
 	}
 
 	function testInsertsheet_normal()
@@ -215,6 +225,7 @@ contract TestUser
 		var ret_delist  = user_b.delistRequest(user_b_id, ret_market_id, buy_qty);//摘牌
         user_a.confirmList(1);         //确认
         user_b.confirmList(1);         //确认
+        var ret_confirm     = user_a.confirmList(2);
         var ret_a_funds     =  user_a.getTotalFunds();
         var ret_b_funds     =  user_b.getTotalFunds();
         var ret_a_sheet     =  user_a.getSheetAllAmount(sheet_id);
@@ -230,6 +241,7 @@ contract TestUser
         Assert.equal(ret_b_funds, 80000, "");
         Assert.equal(ret_a_sheet,58, "");
         Assert.equal(ret_b_sheet,2, "");
+        Assert.equal(ret_confirm,-1, "");
 	
     }
 

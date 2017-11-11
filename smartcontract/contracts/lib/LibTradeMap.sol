@@ -70,13 +70,12 @@ library LibTradeMap
     {
         return self.data[k];
     }
-    /*
-    function isExisted(TradeMap storage self, bytes32 k) internal returns (bool existed)
+    
+    function isExisted(TradeMap storage self, uint k) internal returns (bool existed)
     {
-        var (ret, ) = LibString.inArray(k, self.keyIndex);
-        return ret;
+        existed  = LibArray.isExisted(self.keyIndex, k);
     }
-    */
+   
     function empty(TradeMap storage self) internal returns (bool)
     {
         return (self.keyIndex.length == 0);

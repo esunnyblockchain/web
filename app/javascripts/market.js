@@ -5,13 +5,11 @@ import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract'
 
 // Import our contract artifacts and turn them into usable abstractions.
-import User_artifacts from '../../smartcontract/build/contracts/User.json'
-import UserList_artifacts from '../../smartcontract/build/contracts/UserList.json'
+import Proxy_artifacts from '../../smartcontract/build/contracts/Proxy.json'
 import Market_artifacts from '../../smartcontract/build/contracts/Market.json'
 
-// User UserList Market ContractAddress is our usable abstraction, which we'll use through the code below.
-var User = contract(User_artifacts);
-var UserList = contract(UserList_artifacts);
+// Proxy UserList Market ContractAddress is our usable abstraction, which we'll use through the code below.
+var Proxy = contract(Proxy_artifacts);
 var Market = contract(Market_artifacts);
 
 // The following code is simple to show off interacting with your contracts.
@@ -21,9 +19,8 @@ var accounts;
 var account;
 let rowseq;
 
-var user_instance;
+var proxy_instance;
 var market_instance;
-var userList_instance;
 
 //挂单行情同步
 var local_market_id;
@@ -42,6 +39,8 @@ var mutex_myTrade = 0;
 var myListFirstClick = 0;
 var myReceiptFirstClick = 0;
 
+//user_id
+var user_id;
 window.App = {
   //<系统时间戳转为yyyymmdd
   transTimeStamp: function(time){
@@ -62,8 +61,7 @@ window.App = {
 
   start: async function() {
     var self = this;
-    User.setProvider(web3.currentProvider);
-    UserList.setProvider(web3.currentProvider);
+    Proxy.setProvider(web3.currentProvider);
     Market.setProvider(web3.currentProvider);
 
     // Get the initial account balance so it can be displayed.
@@ -80,15 +78,15 @@ window.App = {
       account = accounts[0];
     });
     
-    //获取user合约地址
-    userList_instance = await UserList.deployed();
-    var user_id = "User";
-    var ret = await userList_instance.getUserInfo.call(user_id);
-    var user_addr = ret[1];
-    console.log("From userList:"+user_id+ "user_addr"+user_addr.toString());
-    user_instance = await User.at(user_addr);
+    //获取user_id
+    var url = location.href;
+    user_id = url.substring(url.indexOf("?")+1, url.length).split("=")[1];
+    console.log("界面跳转user_id:"+user_id);
+
+    //获取Proxy实例
+    proxy_instance = await Proxy.deployed();
     
-    //获取marketID
+    //获取Market实例和marketID
     market_instance = await Market.deployed();
     local_market_id = await market_instance.getMarketID.call();
     console.log("Start local_market_id:"+local_market_id);
@@ -245,7 +243,7 @@ window.App = {
     console.log("dead_line:"+dead_line);
 
     //TODO 对sheet_id进行检查，sheet_amount进行检查
-    var txHash = await user_instance.listRequest.sendTransaction("User",sheet_id, sheet_price, sheet_amount,{from:account, gas:9000000});
+    var txHash = await proxy_instance.listRequest.sendTransaction(user_id, "UserA", sheet_id, sheet_price, sheet_amount,{from:account, gas:9000000});
     console.log("marktet_transactionHash:"+txHash);
   },
 
@@ -257,40 +255,41 @@ window.App = {
     if(!onListing)
     {
         onListing++;
-    var event = await market_instance.getRet({ret:local_market_id},{fromBlock: 0,toBlock:'latest'});
-    await event.watch(async function(error, result){
-        if (!error)
-        {
-            console.log("listRequest retMarketid:"+result.args.ret);
-            var retMarketid = result.args.ret;
-            if (retMarketid != -1)
+        var event = await market_instance.getRet({ret:local_market_id},{fromBlock: 0,toBlock:'latest'});
+        await event.watch(async function(error, result){
+            if (!error)
             {
-                //获取市场行情 
-                var ret = await market_instance.getMarketStrByMarketID_1.call(retMarketid);
-                var date = ret[0];
-                var market_id = ret[1];
-                var sheet_id = ret[2];
-                var class_id = ret[3];
-                var make_date = ret[4];
-                var lev_id = ret[5];
-                var whe_id = ret[6];
-                var place_id = ret[7];
-                ret = await market_instance.getMarketStrByMarketID_2.call(retMarketid);
-                var price = ret[0];
-                var list_qty = ret[1];
-                var deal_qty = ret[2];
-                var rem_qty = ret[3];
-                var dead_line = ret[4];
-                var dlv_uint = ret[5];
-                var user_id = ret[6];
-                App.addTr(date, market_id, sheet_id, class_id,make_date, lev_id, whe_id, place_id, "yikoujia", price, list_qty,deal_qty, rem_qty, dead_line, dlv_uint);
-                local_market_id++;
-              }//if(retMarketid != -1)
-              onListing = 0;
-              event.stopWatching();
-           }//if
-        //停止
-     });//event
+                console.log("listRequest retMarketid:"+result.args.ret);
+                var retMarketid = result.args.ret;
+                if (retMarketid != -1)
+                {
+                    //获取市场行情 
+                    var ret = await market_instance.getMarketStrByMarketID_1.call(retMarketid);
+                    var date = ret[0];
+                    var market_id = ret[1];
+                    var sheet_id = ret[2];
+                    var class_id = ret[3];
+                    var make_date = ret[4];
+                    var lev_id = ret[5];
+                    var whe_id = ret[6];
+                    var place_id = ret[7];
+                    ret = await market_instance.getMarketStrByMarketID_2.call(retMarketid);
+                    var price = ret[0];
+                    var list_qty = ret[1];
+                    var deal_qty = ret[2];
+                    var rem_qty = ret[3];
+                    var dead_line = ret[4];
+                    var dlv_uint = ret[5];
+                    var user_id = ret[6];
+                    App.addTr(date, market_id, sheet_id, class_id,make_date, lev_id, whe_id, 
+                              place_id, "yikoujia", price, list_qty,deal_qty, rem_qty, dead_line, 
+                              dlv_uint);
+                    local_market_id++;
+                }//if(retMarketid != -1)
+                onListing = 0;
+                event.stopWatching();
+            }//if
+        });//event
     }
   },
 
@@ -309,14 +308,15 @@ window.App = {
             //加锁
             mutex_myList = 1;
             //获取我的挂单数量
-            var num = await user_instance.getListReqNum.call();
+            var num = await proxy_instance.getListReqNum.call(user_id);
             console.log("myList num:"+num);
             //显示我的挂单
             for (var index = 0; index < num; index++)
             {
-                var ret = await user_instance.getListReq.call(index);
+                var ret_1 = await proxy_instance.getListReq_1.call(user_id, index);
+                var ret_2 = await proxy_instance.getListReq_2.call(user_id, index);
                 //添加我的挂单
-                App.addMyList(ret[1],App.transTimeStamp(ret[2]),ret[3],ret[4],ret[5],"卖出",ret[6],ret[7],ret[8],ret[9],"deadline");
+                App.addMyList(ret_1[1],App.transTimeStamp(ret_1[2]),ret_1[3],ret_1[4],ret_2[0],"卖出",ret_2[1],ret_2[2],ret_2[3],ret_2[4],"deadline");
             }
             //解锁
             mutex_myList = 0;
@@ -338,13 +338,13 @@ window.App = {
             //加锁
             mutex_myTrade = 1;
 
-            var num = await user_instance.getTradeNum.call();
+            var num = await proxy_instance.getTradeNum.call(user_id);
             console.log("!!!myTrade num:"+num);
             for (var index = 0; index < num; index++)
             {
-                var ret = await user_instance.getTrade.call(index);
-                App.addmyTrade(ret[0],ret[1],ret[2],ret[3],ret[4],ret[5],ret[6],ret[7]);
-                console.log(ret[8]);
+                var ret_1 = await proxy_instance.getTrade_1.call(user_id ,index);
+                var ret_2 = await proxy_instance.getTrade_2.call(user_id, index);
+                App.addmyTrade(ret_1[0],ret_1[1],ret_1[2],ret_1[3],ret_2[0],ret_2[1],ret_2[2],ret_2[3]);
             }
             //解锁
             mutex_myTrade = 0;
@@ -364,15 +364,13 @@ window.App = {
         //每次点击都会清空tbody
         var tBody = table.tBodies[0];
         tBody.parentNode.outerHTML = tBody.parentNode.outerHTML.replace(tBody.innerHTML, "");  
-        //数据参数
-        var user_id = "User";
         //加锁
         mutex_myReceipt = 1;
-        var len = await user_instance.getSheetMapNum.call();
+        var len = await proxy_instance.getSheetMapNum.call(user_id);
         console.log("sheetMap len:"+len);
         for (var index = 0; index < len; index++)
         {
-            var result = await user_instance.getSheetMap_1.call(index);
+            var result = await proxy_instance.getSheetMap_1.call(user_id,index);
             var sheet_id = result[1];
             console.log("class_id:"+result[2]);
             var class_id = result[2];
@@ -380,16 +378,16 @@ window.App = {
             var make_date = result[3];
             console.log("lev_id:"+result[4]);
             var lev_id = result[4];
-            console.log("whe_id:"+result[5]);
-            var whe_id = result[5];
-            console.log("place_id:"+result[6]);
-            var place_id = result[6];
-            result = await user_instance.getSheetMap_2.call(index);
-            var all_amount = result[0];
+            result = await proxy_instance.getSheetMap_2.call(user_id, index);
+            console.log("whe_id:"+result[0]);
+            var whe_id = result[0];
+            console.log("place_id:"+result[1]);
+            var place_id = result[1];
+            var all_amount = result[2];
             console.log("all_amount:"+all_amount);
-            var avail_amount = result[1];
+            var avail_amount = result[3];
             console.log("avail_amount:"+avail_amount);
-            var frozen_amount = result[2];
+            var frozen_amount = result[4];
             console.log("frozen_amount:"+frozen_amount);
             await self.addmyReceipt(user_id, sheet_id, class_id, make_date, lev_id, whe_id, place_id, all_amount, avail_amount, frozen_amount);
        }
@@ -587,14 +585,13 @@ window.App = {
         delWindow.document.close();
         //设置买方ID和摘牌数量
         var obj = delWindow.document.getElementById("userid");
-        obj.setAttribute("value","User");
+        obj.setAttribute("value",user_id);
         obj = delWindow.document.getElementById("marketid");
         obj.setAttribute("value", market_id);
         
-        var buy_user_id = "User";
         delWindow.document.getElementById("confirm").onclick=function(){
                 var amount =  parseInt(delWindow.document.getElementById("amount").value);
-                App.delisting(tr, buy_user_id, market_id, amount); 
+                App.delisting(tr, user_id, market_id, amount); 
                 delWindow.close();
             };
     },
@@ -603,14 +600,12 @@ window.App = {
     delisting: async function(tr,buy_user_id,market_id, amount){
         console.log("delisting!!!!");
         console.log("挂牌序号:"+market_id);
-        console.log("摘牌数量:"+amount);
-        console.log(user_instance); 
+        console.log("摘牌数量:"+amount); 
         console.log("account:"+account);
+        console.log("买方ID:"+buy_user_id);
         
-        //设置资金
-        await user_instance.insertFunds.sendTransaction(900000,{from:account, gas:9000000});
         //调用智能合约进行摘牌
-        var ret = await user_instance.delistRequest.sendTransaction(buy_user_id, market_id, amount,{from:account,gas:9000000});
+        var ret = await proxy_instance.delistRequest.sendTransaction(user_id, buy_user_id, market_id, amount,{from:account,gas:9000000});
     },
 
     //<填充市场行情表单

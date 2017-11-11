@@ -53,5 +53,26 @@ library LibArray
         }
         self.length = self.length - j;
     }
+
+    function isExisted(bytes32[] storage self, bytes32 element) internal returns(bool)
+    {
+        for(uint i = 0; i < self.length; ++i)
+        {
+            if(self[i] == element)
+                return true;
+        }
+        return false;
+    }
+
+    function isExisted(uint[] storage self, uint element) internal returns(bool)
+    {
+        for(uint i = 0; i < self.length; ++i)
+        {
+            if(self[i] == element)
+                return true;
+        }
+        return false;
+    }
+
 }
 

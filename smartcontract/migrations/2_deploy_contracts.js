@@ -22,9 +22,11 @@ var ContractAddress = artifacts.require("ContractAddress");
 var User = artifacts.require("User");
 var UserList = artifacts.require("UserList");
 var Market = artifacts.require("Market");
+var Proxy = artifacts.require("Proxy");
+var Login = artifacts.require("Login");
+var Admin = artifacts.require("Admin");
 
 module.exports = function(deployer) {
-
 
   //independ
   deployer.deploy(CreateID);
@@ -48,7 +50,7 @@ module.exports = function(deployer) {
   //befor deploy contract. link lib.
   deployer.link(StructAddressInfo, [ContractAddress]);
   deployer.link(LibArray, [ContractAddress, Market, UserList]);
-  deployer.link(LibString, [ContractAddress]);
+  deployer.link(LibString, [ContractAddress,Admin]);
   deployer.link(LibAddressMap, [ContractAddress]);
 
   deployer.link(StructMarket, [Market]);
@@ -58,8 +60,7 @@ module.exports = function(deployer) {
   deployer.link(LibUserAddrMap, [UserList]);
 
   deployer.link(StructSheet, [User]);
-  deployer.link(LibSheetMap, [User]);
-
+  deployer.link(LibSheetMap, [User,Admin]);
   deployer.link(StructTrade, [User]);
   deployer.link(LibTradeMap, [User]);
 
@@ -67,5 +68,8 @@ module.exports = function(deployer) {
   deployer.deploy(ContractAddress);
   deployer.deploy(Market);
   deployer.deploy(UserList);
+  deployer.deploy(Admin);
   deployer.deploy(CreateID);
+  deployer.deploy(Proxy);
+  deployer.deploy(Login);
 };

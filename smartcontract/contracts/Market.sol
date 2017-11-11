@@ -199,22 +199,27 @@ contract  Market
 
         UserList user_list  = UserList(contract_address.getContractAddress(user_list_name));
         assert(user_list != empty_addr);
-
+        
         User sell_user      = User(user_list.getUserAgentAddr(temp_market.user_id_));
         User buy_user       = User(user_list.getUserAgentAddr(buy_user_id));
         assert(sell_user != empty_addr);
         assert(buy_user != empty_addr);
+        if (buy_user == empty_addr)
+        {
+            return -2;
+        }
        
         //更新卖方挂牌请求
         sell_user.updateListReq(selected_market_id, confirm_qty);
 
         //记录成交
-        uint time = now;
+        uint time = now; 
         uint trade_id = getTradeID(); 
+       
         sell_user.recordTrade(time, trade_id, buy_user_id, "卖", confirm_qty, selected_market_id);
         buy_user.recordTrade(time, trade_id, temp_market.user_id_,"买", confirm_qty, selected_market_id);
-
-        //确认量等于挂牌量，删除该条行情
+       
+       //确认量等于挂牌量，删除该条行情
         if(confirm_qty == temp_market.rem_qty_)         
         { 
             market_map.remove(selected_market_id);

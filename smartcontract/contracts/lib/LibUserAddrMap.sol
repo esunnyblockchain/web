@@ -38,13 +38,13 @@ library LibUserAddrMap
     {
         return self.data[k];
     }
-    /*
+    
+    //user_id 是否存在
     function isExisted(UserAddrMap storage self, bytes32 k) internal returns (bool existed)
     {
-        var (ret, ) = LibString.inArray(k, self.keyIndex);
-        return ret;
+        existed = LibArray.isExisted(self.keyIndex, k);
     }
-    */
+
     function empty(UserAddrMap storage self) internal returns (bool)
     {
         return (self.keyIndex.length == 0);

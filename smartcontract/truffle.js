@@ -9,4 +9,4 @@ module.exports = {
 //	  gasprice:1
     }
   }
-}
+};
