@@ -1,9 +1,0 @@
-/build
-/truffle.js
-*.swp
-*.swo
-*~
-!.gitignore
-!*.sol
-!/migrations/*.js
-
