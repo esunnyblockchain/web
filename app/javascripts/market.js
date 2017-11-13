@@ -224,7 +224,7 @@ window.App = {
         console.log("getMarket_2 seller_addr:"+result[7]);
         
         //在界面增加行情内容
-        App.addTr(date,market_id, sheet_id, class_id, make_date, lev_id,whe_id, place_id, "yikoujia",price, list_qty, deal_qty, rem_qty, dead_line,dlv_uint);          
+        App.addTr(date,market_id, sheet_id, class_id, make_date, lev_id,whe_id, place_id, "yikoujia",price, list_qty, deal_qty, rem_qty, dlv_uint);          
       }//for
   },
 
@@ -239,9 +239,6 @@ window.App = {
     var sheet_amount = parseInt(document.getElementById("textfield2").value);
     console.log("sheet_amount:"+sheet_amount);
    
-    var dead_line = document.getElementById("textfield3").value;
-    console.log("dead_line:"+dead_line);
-
     //TODO 对sheet_id进行检查，sheet_amount进行检查
     var txHash = await proxy_instance.listRequest.sendTransaction(user_id, "UserA", sheet_id, sheet_price, sheet_amount,{from:account, gas:9000000});
     console.log("marktet_transactionHash:"+txHash);
@@ -316,7 +313,7 @@ window.App = {
                 var ret_1 = await proxy_instance.getListReq_1.call(user_id, index);
                 var ret_2 = await proxy_instance.getListReq_2.call(user_id, index);
                 //添加我的挂单
-                App.addMyList(ret_1[1],App.transTimeStamp(ret_1[2]),ret_1[3],ret_1[4],ret_2[0],"卖出",ret_2[1],ret_2[2],ret_2[3],ret_2[4],"deadline");
+                App.addMyList(ret_1[1],App.transTimeStamp(ret_1[2]),ret_1[3],ret_1[4],ret_2[0],"卖",ret_2[1],ret_2[2],ret_2[3],ret_2[4]);
             }
             //解锁
             mutex_myList = 0;
@@ -417,7 +414,7 @@ window.App = {
     },
     //填充taList表
     //参数：委托编号(挂单编号),委托日期(挂单日期),等级,产期,等级,买卖,价格,挂牌量,剩余量,成交量,挂牌到期日
-    addMyList: function(market_id, trade_date,class_id, make_date, lev_id, buyorsell, price, list_qty, rem_qty, deal_qty, dead_line){
+    addMyList: function(market_id, trade_date,class_id, make_date, lev_id, buyorsell, price, list_qty, rem_qty, deal_qty){
         var table = document.getElementById("taList");
         var tr = document.createElement('tr');
 
@@ -464,10 +461,6 @@ window.App = {
         var td_dealAmount = document.createElement('td');
         td_dealAmount.innerHTML = deal_qty;
         tr.appendChild(td_dealAmount);
-
-        var td_deadline = document.createElement('td');
-        td_deadline.innerHTML = dead_line;
-        tr.appendChild(td_deadline);
 
         table.tBodies[0].appendChild(tr); 
     }, 
@@ -686,11 +679,6 @@ window.App = {
      var td_rem_qty = document.createElement('td');
      td_rem_qty.innerHTML = rem_qty;
      tr.appendChild(td_rem_qty);
-
-     //插入dealine
-     var td_deadline = document.createElement('td');
-     td_deadline.innerHTML = deadline;
-     tr.appendChild(td_deadline);
 
      //插入dlv_uint
      var td_dlv_uint = document.createElement('td');
