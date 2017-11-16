@@ -1,4 +1,8 @@
 build
 node_modules
-yarn-error.log
 smartcontract
+yarn-error.log
+.gitmodules
+*.log
+*.md
+.*
