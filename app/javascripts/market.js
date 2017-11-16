@@ -279,7 +279,7 @@ window.App = {
                     var dlv_uint = ret[5];
                     var user_id = ret[6];
                     App.addTr(date, market_id, sheet_id, class_id,make_date, lev_id, whe_id, 
-                              place_id, "yikoujia", price, list_qty,deal_qty, rem_qty, dead_line, 
+                              place_id, "yikoujia", price, list_qty,deal_qty, rem_qty, 
                               dlv_uint);
                     local_market_id++;
                 }//if(retMarketid != -1)
@@ -602,7 +602,7 @@ window.App = {
     },
 
     //<填充市场行情表单
-	addTr: function(date,market_id, sheet_id, class_id, mkdate, lev, whe_id, place_id, price_type, price, list_qty, deal_qty, rem_qty, deadline, dlv_uint){
+	addTr: function(date,market_id, sheet_id, class_id, mkdate, lev, whe_id, place_id, price_type, price, list_qty, deal_qty, rem_qty, dlv_uint){
      //获取table实例
      var table = document.getElementById("taMarketList");
      //定义行元素
