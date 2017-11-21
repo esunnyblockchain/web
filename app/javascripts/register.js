@@ -1,3 +1,4 @@
+import "../stylesheets/app.css";
 import { default as Web3} from 'web3';
 import { default as contract } from 'truffle-contract'
 
@@ -35,12 +36,24 @@ window.App ={
     {
         var self = this;
         var user_addr = document.getElementById("useraddr").value;
+        var user_id = document.getElementById("userid").value; 
+        var funds = parseInt(document.getElementById("funds").value);
+
+        //登记到userlist
+        console.log("account addr:"+account); 
+        //录入用户仓单
+        await admin_instance.addUser.sendTransaction(user_id, user_addr, funds,{from:account});
+   },
+
+   insertSheet: async function()
+   {
+        
         var user_id = document.getElementById("userid").value;
 
         var class_id = document.getElementById("classid").value;
-        var asscii_class_id = web3.fromAscii(class_id);
-        console.log("asscii_class_id:"+asscii_class_id);
-
+        var ascii_class_id = web3.fromAscii(class_id);
+        console.log("asscii_class_id:"+ascii_class_id);
+    
         var make_date = document.getElementById("makeDate").value;
         var ascii_make_date = web3.fromAscii(make_date);
         console.log("ascii_make_date:"+ascii_make_date);
@@ -57,19 +70,12 @@ window.App ={
         var ascii_palce_id = web3.fromAscii(place_id);
         console.log("ascii_palce_id:"+ascii_palce_id);
 
-        var receipt_amount = parseInt(document.getElementById("receiptamount").value);
+        var all_amount = parseInt(document.getElementById("receiptamount").value);
         var frozen_amount = parseInt(document.getElementById("frozenamount").value);
         var available_amount = parseInt(document.getElementById("availableamount").value);
-        console.log("receipt_amount:"+receipt_amount);
-        
-        var funds = parseInt(document.getElementById("funds").value);
+        console.log(all_amount);
 
-        //登记到userlist
-        console.log("account addr:"+account); 
-        //录入用户仓单
-        await admin_instance.addUser.sendTransaction(user_addr, user_id, asscii_class_id, ascii_make_date,  
-                                        ascii_lev_id, ascii_whe_id, ascii_palce_id, receipt_amount,
-                                        frozen_amount,available_amount,funds,{from:account});
+        await admin_instance.insertSheet.sendTransaction(user_id, ascii_class_id, ascii_make_date, ascii_lev_id, ascii_whe_id, ascii_palce_id, all_amount, frozen_amount, available_amount,{from:account});
    }
 }
 

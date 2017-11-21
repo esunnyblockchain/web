@@ -26,7 +26,7 @@ window.App ={
         {
             if(ret[1] == 5)
             {
-                    var link ="adminUser.html?addr="+ret[2];
+                    var link ="register.html?addr="+ret[2];
                     window.location.href=link;
             }
             else if(ret[1] == 1)

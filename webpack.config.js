@@ -3,10 +3,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry:{ 
-       app:'./app/javascripts/app.js',
+	   login:'./app/javascripts/login.js',
+	   register:'./app/javascripts/register.js',
        market:'./app/javascripts/market.js',
-	   adminUser:'./app/javascripts/adminUser.js',
-	   login:'./app/javascripts/login.js'
   },
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -15,10 +14,9 @@ module.exports = {
   plugins: [
     // Copy our app's index.html to the build folder.
     new CopyWebpackPlugin([
-      { from: './app/index.html', to: "index.html" },
+	  { from: './app/login.html', to: "login.html" },
+      { from: './app/register.html', to: "register.html" },
       {from:'./app/market.html', to:"market.html"},
-	  {from:'./app/adminUser.html', to:"adminUser.html"},
-	  { from: './app/login.html', to: "login.html" }
     ])
   ],
   module: {

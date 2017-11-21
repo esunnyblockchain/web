@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WareHouse ReceiptDemo w/ Frontend</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <script src="./register.js"></script>
+</head>
+<body>
+  <h1>账户注册</h1>
+  <br>
+  <br><label for="useraddr">用户地址</label><input type="text" id="useraddr" placeholder="注：该ID需要通过管理员的审核"></input>
+  <br><label for="userid">用户ID:</label><input type="text" id="userid" placeholder="e.g., A"></input>
+  <br><label for="funds">资金:</label><input type="text" id="funds" placeholder="e.g.,900000"></input>
+<br><br><button id="adduser" onclick="App.addUser()">增加用户</button>
+  <br><br>
+  <h1>仓单录入</h1>
+  <br>
+  <br><label for="userid">用户ID:</label><input type="text" id="userid" placeholder="e.g., A"></input>
+  <br><label for="classid">品种:</label><input type="text" id="classid" placeholder="e.g.,suguar"></input>
+  <br><label for="makedate">产期:</label><input type="text" id="makeDate" placeholder="e.g.,2017"></input>
+  <br><label for="levelid">等级:</label><input type="text" id="levelid" placeholder="e.g.,lev"></input>
+  <br><label for="wheid">仓库:</label><input type="text" id="wheid" placeholder="e.g.,HeNan"></input>
+  <br><label for="placeID">产地:</label><input type="text" id="placeID" placeholder="e.g.,palceid"></input>
+  <br><label for="receiptamount">仓单总量:</label><input type="text" id="receiptamount" placeholder="e.g.,100"></input>
+  <br><label for="frozenamount">仓单冻结量:</label><input type="text" id="frozenamount" placeholder="e.g.,100"></input>
+  <br><label for="availableamount">仓单可用量:</label><input type="text" id="availableamount" placeholder="e.g.,100"></input>
+  
+  <br><br><button id="createRecipt" onclick="App.insertSheet()">录入仓单</button>
+  <br><br>
+  <span id="status"></span>
+  <br>
+  <span class="hint"><strong>Hint:</strong> open the browser developer console to view any errors and warnings.</span>
+</body>
+</html>

@@ -310,10 +310,24 @@ window.App = {
             //显示我的挂单
             for (var index = 0; index < num; index++)
             {
-                var ret_1 = await proxy_instance.getListReq_1.call(user_id, index);
-                var ret_2 = await proxy_instance.getListReq_2.call(user_id, index);
+                var ret = await proxy_instance.getListReq_1.call(user_id, index);
+                var class_id = ret[0];
+                var make_date = ret[1];
+                var lev_id = ret[2];
+                var wh_id = ret[3];
+                var place_id = ret[4];
+
+                ret = await proxy_instance.getListReq_2.call(user_id, index);
+                var sheet_id = ret[0];
+                var market_id = ret[1];
+                var date = ret[2];
+                var price = ret[3];
+                var list_qty = ret[4];
+                var deal_qty = ret[5];
+                var rem_qty = ret[6];
+
                 //添加我的挂单
-                App.addMyList(ret_1[1],App.transTimeStamp(ret_1[2]),ret_1[3],ret_1[4],ret_2[0],"卖",ret_2[1],ret_2[2],ret_2[3],ret_2[4]);
+                App.addMyList(market_id,App.transTimeStamp(date), class_id, make_date, lev_id, "卖", price, list_qty, deal_qty, rem_qty);
             }
             //解锁
             mutex_myList = 0;
@@ -339,9 +353,33 @@ window.App = {
             console.log("!!!myTrade num:"+num);
             for (var index = 0; index < num; index++)
             {
-                var ret_1 = await proxy_instance.getTrade_1.call(user_id ,index);
-                var ret_2 = await proxy_instance.getTrade_2.call(user_id, index);
-                App.addmyTrade(ret_1[0],ret_1[1],ret_1[2],ret_1[3],ret_2[0],ret_2[1],ret_2[2],ret_2[3]);
+                var ret = await proxy_instance.getTrade_1.call(user_id ,index);
+                var id = ret[0];
+                console.log("user_id:"+id);
+                var opp_id = ret[1];
+                console.log("opp_id:"+opp_id);
+                var bs = ret[2];
+                console.log("bs:"+bs);
+                var trade_state = ret[3];
+                console.log("trade_state:"+trade_state);
+              
+                var ret = await proxy_instance.getTrade_2.call(user_id, index);
+                var trade_date = ret[0];
+                console.log("Trade_date:"+trade_date);
+                var trade_id = ret[1];
+                console.log("Trade_id"+ trade_id);
+                var sheet_id = ret[2];
+                console.log("sheet_id"+sheet_id);
+                var price = ret[3];
+                console.log("price:"+price);
+                var trade_qty = ret[4];
+                console.log("trade_qty:"+trade_qty);
+                var payment = ret[5];
+                console.log("payment:"+payment);
+                var fee = ret[6];
+                console.log("fee:"+fee);
+
+                App.addmyTrade(trade_date, trade_id, sheet_id, bs, price, trade_qty, id, opp_id, fee, payment, trade_state);
             }
             //解锁
             mutex_myTrade = 0;
@@ -466,8 +504,8 @@ window.App = {
     }, 
 
     //填充taTrade表
-    //参数：合同日期, 合同编号, 仓单编号, 买卖, 价格, 合同量, 手续费, 已拨货款, 剩余货款, 己方id, 对手方id, 交收状态, 交易方式
-    addmyTrade: function(trade_date, trade_id, sheet_id, buyorsell, price, trade_qty, user_id, opp_id){
+    //参数：合同日期, 合同编号, 仓单编号, 买/卖, 价格, 合同量, 买方, 卖方, 手续费, 总价, 状态
+    addmyTrade: function(trade_date, trade_id, sheet_id, buyorsell, price, trade_qty, user_id, opp_id, fee, payment, trade_state){
         var table = document.getElementById("taTrade");
         var tr = document.createElement('tr');
         
@@ -502,7 +540,19 @@ window.App = {
         var td_oppid = document.createElement('td');
         td_oppid.innerHTML = opp_id;
         tr.appendChild(td_oppid);
+        
+        var td_fee = document.createElement('td');
+        td_fee.innerHTML = fee;
+        tr.appendChild(td_fee);
 
+        var td_payment = document.createElement('td');
+        td_payment.innerHTML = payment;
+        tr.appendChild(td_payment);
+        
+        var td_trade_state = document.createElement('td');
+        td_trade_state.innerHTML = trade_state;
+        tr.appendChild(td_trade_state);
+        
         table.tBodies[0].appendChild(tr);
 
     },
