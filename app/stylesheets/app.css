@@ -1,7 +1,6 @@
 body {
-  margin-left: 25%;
-  margin-right: 25%;
-  margin-top: 10%;
+  margin-left:5%;
+  margin-top:2.5%;
   font-family: "Open Sans", sans-serif;
 }
 
@@ -11,14 +10,18 @@ label {
 }
 
 input {
-  width: 500px;
+  width: 200px;
   padding: 5px;
   font-size: 16px;
 }
 
 button {
-  font-size: 16px;
+  font-size: 10px;
   padding: 5px;
+}
+.del_btn {
+  width: 40px; 
+  font-size:8px;
 }
 
 h1, h2 {
@@ -47,6 +50,59 @@ h3 {
   color: black;
 }
 
-.hint {
-  color: #666;
+#topleft{
+    margin-top:20px;
+    float:left;
+    width:40%;
+    height:700px;
 }
+#topright{
+    margin-top:20px;
+    float:right;
+    width:60%;
+    height:300px;
+}
+ul
+{
+list-style-type:none;
+margin:0;
+padding:0;
+overflow:hidden;
+}
+li
+{
+float:left;
+}
+
+.fixed {
+  width:900px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.fixed th {
+  text-decoration: underline;
+}
+.fixed th,
+.fixed td {
+  padding: 5px;
+  text-align: center;
+  width:90px;
+  min-width: 40px;
+}
+
+.fixed thead {
+  background-color: AliceBlue;
+}
+.fixed thead tr {
+  display: block;
+  position: relative;
+}
+.fixed tbody {
+  display: block;
+  overflow: auto;
+  width: 100%;
+  height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
