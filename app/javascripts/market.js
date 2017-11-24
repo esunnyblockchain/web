@@ -240,7 +240,7 @@ window.App = {
     console.log("sheet_amount:"+sheet_amount);
    
     //TODO 对sheet_id进行检查，sheet_amount进行检查
-    var txHash = await proxy_instance.listRequest.sendTransaction(user_id, "UserA", sheet_id, sheet_price, sheet_amount,{from:account, gas:9000000});
+    var txHash = await proxy_instance.listRequest.sendTransaction(user_id,sheet_id, sheet_price, sheet_amount,{from:account, gas:9000000});
     console.log("marktet_transactionHash:"+txHash);
   },
 
@@ -376,7 +376,7 @@ window.App = {
                 console.log("trade_qty:"+trade_qty);
                 var payment = ret[5];
                 console.log("payment:"+payment);
-                var fee = ret[6];
+                var fee = ret[6]/100;
                 console.log("fee:"+fee);
 
                 App.addmyTrade(trade_date, trade_id, sheet_id, bs, price, trade_qty, id, opp_id, fee, payment, trade_state);

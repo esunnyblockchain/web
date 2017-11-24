@@ -187,26 +187,41 @@ window.App ={
        edit_btn.appendChild(li_edit);
        edit_btn.onclick = function(){App.update(this);};
        save_btn.appendChild(li_save);
-       save_btn.onclick= async function(){
-            
-                            }
+       save_btn.onclick= async function(){App.save(this);};
 
        td_opt.appendChild(del_btn);
        td_opt.appendChild(edit_btn);
        td_opt.appendChild(save_btn);
        tr.appendChild(td_opt);
 
-       table.tBodies[0].appendChild(tr);
-       
+       table.tBodies[0].appendChild(tr); 
    },
    //修改资金
    update: function(btn)
    {
-        //设置btn保存按钮
-       btn.className = undefined; 
-       btn.className = "fa fa-save";
-        //var tr = btn.parentNode.parentNode;
+       var tr = btn.parentNode.parentNode;
        // console.log(tr);
+       var td = tr.cells[5];
+       var txt = document.createElement("input");
+       txt.type = "text";
+       txt.style.width="40px";
+       txt.value = td.innerHTML;
+       td.innerHTML = "";
+       td.appendChild(txt);
+   },
+   //保存资金修改
+   save: async function(btn)
+   {
+       var tr = btn.parentNode.parentNode;
+       var td_allfunds = tr.cells[5];
+       var new_funds =td_allfunds.children[0].value;
+       
+       var id = tr.cells[0].innerHTML;
+       console.log("用户:"+id);
+       var asscii_id = web3.fromAscii(id);
+       await admin_instance.modifyFunds.sendTransaction(asscii_id, new_funds, {from:account});
+       td_allfunds.innerHTML = new_funds;
+       tr.cells[7].innerHTML = new_funds;
    },
    //查看用户仓单详情
    detailList: async function(id)
@@ -218,9 +233,13 @@ window.App ={
         var tBody = table.tBodies[0];
         tBody.parentNode.outerHTML = tBody.parentNode.outerHTML.replace(tBody.innerHTML, "");
         //仓单种类数
-        var kinds = await admin_instance.getSheetMapSize.call();
+        let kinds = await admin_instance.getSheetMapSize.call(id);
         console.log("仓单种类数:"+kinds);
-        for (var index = 0; index < kinds; index++)
+        if (kinds == 0)
+        {
+            return;
+        }
+        for (let index = 0; index < kinds; index++)
         {
             var ret = await admin_instance.getSheetInfo.call(ascii_userid,index);
             var sheet_id = ret[0];//仓单号
@@ -234,6 +253,13 @@ window.App ={
             var all_amount = ret[0];
             var avail_amount = ret[1];
             var frozen_amount = ret[2];
+            console.log("品种:"+class_id);
+            console.log("仓单号:"+sheet_id);
+            console.log("产地:"+whe_id);
+            console.log("仓库:"+place_id);
+            console.log("产期:"+make_date);
+            console.log("等级:"+lev_id);
+            console.log("仓单总量:"+all_amount);
             App.addDetailList(class_id, sheet_id, whe_id, place_id, make_date, lev_id, all_amount, frozen_amount, avail_amount);
         }
    },

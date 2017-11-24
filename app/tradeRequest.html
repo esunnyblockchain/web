@@ -3,10 +3,53 @@
 <head>
     <title>TradeRequest Management</title>
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link href="http://cdn.bootcss.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="./tradeRequest.js"></script>
 </head>
 <body>
     <h1>交易请求管理</h1>
-    <br>
+    <br><br>
+	 <div class="button-group">
+    <button type="button" class="button button-primary button-rounded button-raised" onclick="App.doingRequest()">待处理请求</button>
+    <button type="button" class="button button-primary button-rounded button-raised" onclick="App.doneRequest()">已处理请求</button>
+  </div>
+  <div id="doing" style="width:60%; min-width:500px">
+  <table id ="tadoing" class="table table-sm">
+  <thead>
+    <tr class="table-active">
+		<th>合同编号</th>
+        <th>品种</th>
+        <th>买方</th>
+        <th>卖方</th>
+        <th>手续费</th>
+        <th>成交价</th>
+        <th>成交量</th>
+        <th>总价</th>
+        <th>操作</th>
+    </tr>
+  </thead>
+	<tbody></tbody>
+  </table>
+  </div>
+  
+  <div id="done" style="width:50%; min-width:500px; display:none">
+  <table id="tadone" class="table table-sm"> 
+  <thead>
+    <tr class="table-active">
+		<th>合同编号</th>
+        <th>品种</th>
+        <th>买方</th>
+        <th>卖方</th>
+        <th>手续费</th>
+        <th>成交价</th>
+        <th>成交量</th>
+        <th>总价</th>
+        <th>状态</th>
+    </tr>
+  </thead>
+	<tbody></tbody>
+  </table>
+  </div>
 </body>
 </html>

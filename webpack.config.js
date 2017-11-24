@@ -6,6 +6,8 @@ module.exports = {
 	   login:'./app/javascripts/login.js',
 	   register:'./app/javascripts/register.js',
        market:'./app/javascripts/market.js',
+       paramter:'./app/javascripts/paramter.js',
+       tradeRequest:'./app/javascripts/tradeRequest.js'
   },
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -17,6 +19,8 @@ module.exports = {
 	  { from: './app/login.html', to: "login.html" },
       { from: './app/register.html', to: "register.html" },
       {from:'./app/market.html', to:"market.html"},
+      {from:'./app/paramter.html', to:"paramter.html"},
+      {from:'./app/tradeRequest.html',to:"tradeRequest.html"}
     ])
   ],
   module: {

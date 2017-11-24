@@ -101,7 +101,7 @@ float:left;
   display: block;
   overflow: auto;
   width: 100%;
-  height: 200px;
+  height: 250px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
