@@ -2,3 +2,4 @@
 	path = smartcontract
 	url = https://github.com/esunnyblockchain/smartcontract.git
     ignore = dirty
+    branch = master 
